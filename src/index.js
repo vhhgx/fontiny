@@ -1,37 +1,27 @@
-const fs = require('fs').promises;
-const path = require('path');
-// 字体压缩工具
-const Fontmin = require('fontmin');
-
 const {
-  logToFile
-} = require('../utils/log')
+  fs,
+  path,
+  standardPath,
+  writeLogs
+} = require('../utils')
 
-const {
-  formatterPath
-} = require('../utils/correctPath')
 
 const {
   comporessionFont
 } = require('../utils/compression')
 
-// const projectAPath = path.join(__dirname, '..', '..', 'fonts');
-const whitelist = ['cn', 'en'];
 
+// 处理文件
 const processFile = async (filePath) => {
-  // 存放字体的fonts目录
-  let fontsPath = formatterPath('font')
+  // 正在处理的字体，即字体所在路径的相对路径
+  let processing = filePath.slice(standardPath('input').length + 1).replaceAll(path.sep, '/')
 
-  // 截取子串，记录子目录
-  let processedFilePath = filePath.slice(fontsPath.length + 1).replaceAll('\\', '/')
-
-
-  await logToFile(`【开始压缩】 ${processedFilePath}`);
+  await writeLogs(`【开始压缩】 ${processing}`);
 
   // 处理函数接受一个字体所在的绝对路径
   await comporessionFont(filePath)
 
-  await logToFile(`【压缩成功】 ${processedFilePath}`);
+  await writeLogs(`【压缩成功】 ${processing}`);
 };
 
 const processDir = async (dirPath, isRoot = false) => {
@@ -62,9 +52,10 @@ const processDir = async (dirPath, isRoot = false) => {
 // oft转ttf，然后转woff等
 
 // 开始处理
-processDir(formatterPath('font'), true).then(() => {
-  logToFile('全部文件处理完毕！');
+
+processDir(standardPath('input'), true).then(() => {
+  writeLogs('全部文件处理完毕！');
 }).catch(error => {
   console.log('处理过程中发生错误：', error.message)
-  logToFile(`处理过程中发生错误：${error.message}`);
+  writeLogs(`处理过程中发生错误：${error.message}`);
 });
