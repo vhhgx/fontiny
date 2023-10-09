@@ -27,8 +27,6 @@ const standardPath = (key, options = []) => {
  */
 
 const writeLogs = async function (message) {
-  const logMessage = `${dayjs().format('YYYY-MM-DD HH:mm:ss')} - ${message}\n`;
-
   // log 路径
   const logsDir = path.join(process.cwd(), 'logs')
   // logs 文件路径
@@ -39,7 +37,7 @@ const writeLogs = async function (message) {
   // 创建log文件
   new fos(logsFile).create('file')
   // 写入日志
-  new fos(logsFile).append(logMessage)
+  new fos(logsFile).append(message)
 }
 
 
