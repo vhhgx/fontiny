@@ -16,6 +16,16 @@ class fileOperation {
     }
   }
 
+  async delete() {
+    try {
+      await fs.unlink(this.uri);
+      // console.log(`File ${filePath} deleted successfully.`);
+    } catch (error) {
+      console.log('发生错误')
+      // console.error(`Error deleting file ${filePath}:`, error);
+    }
+  }
+
   async append(message) {
     await fs.appendFile(this.uri, message, 'utf8');
   }

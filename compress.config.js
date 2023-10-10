@@ -1,7 +1,10 @@
 module.exports = {
   // NOTE 路径相关
-  input: 'fonts', // 字体存放路径
-  output: 'minimized_fonts', // 压缩后字体存放路径
+  input: 'input', // 字体存放路径
+  output: 'output', // 压缩后字体存放路径
+
+  // NOTE 主进程相关
+  increment: false, // 是否为增量压缩
 
   // NOTE 转换内容
   convertWoff: false, // 是否转换为woff

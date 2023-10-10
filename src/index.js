@@ -5,12 +5,17 @@ const {
   writeLogs
 } = require('../utils')
 
+const {
+  exec
+} = require('child_process')
+
 const fos = require('../utils/fos')
 
 const {
   comporessionFont
 } = require('../utils/compression')
 
+const config = require('../compress.config')
 
 // 处理文件
 const processFile = async (filePath) => {
@@ -37,15 +42,37 @@ const processDir = async (dirPath, isRoot = false) => {
   }
 };
 
+// 增量更新，这里的增量只完成了新增（或许有修改）暂时没有删除，需要精细化调整
+// 是否删除旧内容使用配置文件来控制
+if (config.increment) {
+  // 调用下面的exec逻辑
+  const inputPath = 'cd ../input && git diff --name-only HEAD'
 
-// 这里有个问题 如果是全量更新，则需要删掉该文件，重新生成
-// 创建main.css文件
-const mainFile = path.join(standardPath('output'), `main.css`)
-new fos(mainFile).create('file')
+  // 执行git命令来获取改动的文件列表
+  exec(inputPath, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`)
+      return
+    }
 
+    // 获取改动的文件列表
+    const changedFiles = stdout.split('\n').filter(file => !!file)
 
-processDir(standardPath('input'), true).then(() => {
-  writeLogs('全部文件处理完毕！');
-}).catch(error => {
-  writeLogs(`处理过程中发生错误：${error.message}`);
-});
+    changedFiles.forEach(async file => {
+      // 对新增的的文件进行处理
+      await processFile(path.join(standardPath('input'), file))
+    });
+  })
+} else {
+  const mainFile = path.join(standardPath('output'), `main.css`)
+  // 先删除main.css
+  new fos(mainFile).delete()
+  // 重新创建main.css文件
+  new fos(mainFile).create('file')
+  // 调用最下面的全量更新逻辑
+  processDir(standardPath('input'), true).then(() => {
+    writeLogs('全部文件处理完毕！');
+  }).catch(error => {
+    writeLogs(`处理过程中发生错误：${error.message}`);
+  });
+}
