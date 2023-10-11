@@ -8,11 +8,11 @@ class fileOperation {
     this.uri = uri
   }
 
-  async create(type = 'dir') {
+  async create(type = 'dir', options) {
     try {
       await fs.access(this.uri)
     } catch {
-      type === 'file' ? await fs.writeFile(this.uri, '', 'utf8') : await fs.mkdir(this.uri)
+      type === 'file' ? await fs.writeFile(this.uri, '', 'utf8') : await fs.mkdir(this.uri, options)
     }
   }
 

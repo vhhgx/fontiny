@@ -32,7 +32,7 @@ const processDir = async (dirPath, isRoot = false) => {
     const fullPath = path.join(dirPath, item.name);
     if (item.isDirectory()) {
       // 如果是根目录并且该目录不在白名单中，则跳过
-      if (isRoot && (item.name !== "cn" && item.name !== "en")) {
+      if (isRoot && !config.langs.includes(item.name)) {
         continue
       }
       await processDir(fullPath);

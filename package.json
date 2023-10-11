@@ -1,10 +1,12 @@
 {
   "name": "font_compression_tool",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "一个基于fontmin的批量字体字型提取压缩工具",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node src/index.js",
+    "init": "node src/init.js"
   },
   "keywords": [],
   "author": "",
