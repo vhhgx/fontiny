@@ -1,15 +1,17 @@
-const fs = require('fs').promises;
+const fs = require('fs').promises
 const path = require('path')
-const fos = require('../utils/fos');
+const fos = require('../utils/fos')
 
-const {
-  standardPath
-} = require('../utils')
+const { standardPath } = require('../utils')
 const config = require('../compress.config')
 
-
 // input 路径
-const inputRoute = path.resolve(process.cwd(), '..', config.input, 'cn/youshe/biaotihei/regular')
+const inputRoute = path.resolve(
+  process.cwd(),
+  '..',
+  config.input,
+  'cn/youshe/biaotihei/regular'
+)
 
 // 创建目录
 
@@ -20,13 +22,13 @@ const targetFilePath = path.join(inputRoute, 'ysbth.ttf')
 
 async function copyFile() {
   await new fos(inputRoute).create('dir', {
-    recursive: true
+    recursive: true,
   })
 
   try {
-    await fs.copyFile(sourceFilePath, targetFilePath);
+    await fs.copyFile(sourceFilePath, targetFilePath)
   } catch (error) {
-    console.error('拷贝文件时出错：', error);
+    console.error('拷贝文件时出错：', error)
   }
 }
 

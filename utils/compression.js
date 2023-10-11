@@ -1,14 +1,9 @@
-const Fontmin = require('fontmin');
+const Fontmin = require('fontmin')
 const config = require('../compress.config')
 const dayjs = require('dayjs')
 const fos = require('../utils/fos')
 
-const {
-  fs,
-  path,
-  standardPath,
-  writeLogs
-} = require('../utils')
+const { fs, path, standardPath, writeLogs } = require('../utils')
 
 // 参数 dir 为绝对路径
 const comporessionFont = async function (dir) {
@@ -38,15 +33,17 @@ const comporessionFont = async function (dir) {
 
   // TODO fontPath字符串处理需要抹掉配置中url的/
 
-  const fontFamily = lastItem === 'regular' ? file.slice(0, -4) : `${file.slice(0, -4)}-${lastItem}`
-
+  const fontFamily =
+    lastItem === 'regular'
+      ? file.slice(0, -4)
+      : `${file.slice(0, -4)}-${lastItem}`
 
   // NOTE CSS处理方法
   const toCss = Fontmin.css({
     fontFamily,
     base64: config.toCssBase64,
     local: config.toCssLocal,
-    fontPath: `${config.toCssLoaclPath}${routeWithoutFile.join('/')}/`
+    fontPath: `${config.toCssLoaclPath}${routeWithoutFile.join('/')}/`,
   })
 
   // NOTE 字形处理方法
@@ -57,7 +54,7 @@ const comporessionFont = async function (dir) {
 
   // NOTE 转换为woff
   const toWoff = Fontmin.ttf2woff({
-    deflate: config.deflate
+    deflate: config.deflate,
   })
 
   // NOTE 转换为woff2
@@ -89,31 +86,37 @@ const comporessionFont = async function (dir) {
   // 通用转换
   fontmin.use(toWoff2).use(toCss).dest(dest)
 
+  const startmsg = `${dayjs().format(
+    'YYYY-MM-DD HH:mm:ss'
+  )} - 🪄 开始压缩 ${route}\n`
 
-  const startmsg = `${dayjs().format('YYYY-MM-DD HH:mm:ss')} - 🪄 开始压缩 ${route}\n`;
-
-  writeLogs(startmsg);
+  writeLogs(startmsg)
 
   await fontmin.run((err) => {
     if (err) {
       writeLogs(`❎ 错误：\n ${err} \n`)
-      throw err;
+      throw err
     }
-  });
+  })
 
-  const endmsg = `${dayjs().format('YYYY-MM-DD HH:mm:ss')} - ✅ 压缩成功 ${route}\n`;
+  const endmsg = `${dayjs().format(
+    'YYYY-MM-DD HH:mm:ss'
+  )} - ✅ 压缩成功 ${route}\n`
 
   // main.css 绝对路径
   const mainFile = path.join(standardPath('output'), `main.css`)
 
   // 引入内容
-  const message = `@import url('${routeWithoutFile.join('/')}/${file.slice(0, -4)}.css');\n`
+  const message = `@import url('${routeWithoutFile.join('/')}/${file.slice(
+    0,
+    -4
+  )}.css');\n`
   // 写入css
   new fos(mainFile).append(message)
 
-  writeLogs(endmsg);
+  writeLogs(endmsg)
 }
 
 module.exports = {
-  comporessionFont
+  comporessionFont,
 }

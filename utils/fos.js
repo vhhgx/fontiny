@@ -12,13 +12,15 @@ class fileOperation {
     try {
       await fs.access(this.uri)
     } catch {
-      type === 'file' ? await fs.writeFile(this.uri, '', 'utf8') : await fs.mkdir(this.uri, options)
+      type === 'file'
+        ? await fs.writeFile(this.uri, '', 'utf8')
+        : await fs.mkdir(this.uri, options)
     }
   }
 
   async delete() {
     try {
-      await fs.unlink(this.uri);
+      await fs.unlink(this.uri)
       // console.log(`File ${filePath} deleted successfully.`);
     } catch (error) {
       console.log('发生错误')
@@ -27,7 +29,7 @@ class fileOperation {
   }
 
   async append(message) {
-    await fs.appendFile(this.uri, message, 'utf8');
+    await fs.appendFile(this.uri, message, 'utf8')
   }
 }
 

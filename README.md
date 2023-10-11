@@ -1,6 +1,8 @@
-# FONT_COMPRESSION_TOOL
+# FONTINY
 
 一个基于[fontmin](https://github.com/ecomfe/fontmin)的批量字体字型提取压缩工具，目前仅支持`ttf`（或`otf`）转`woff`和`svg`
+
+- [ ] 搁这儿加一个压缩前后端对比
 
 ## 功能
 

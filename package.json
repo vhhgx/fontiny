@@ -1,19 +1,39 @@
 {
-  "name": "font_compression_tool",
+  "name": "fontiny",
   "version": "0.1.0",
   "description": "一个基于fontmin的批量字体字型提取压缩工具",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node src/index.js",
-    "init": "node src/init.js"
+    "build:tiny": "node src/index.js",
+    "init": "node src/init.js",
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "vhhgx",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.22.15",
+    "@nuxt/devtools": "latest",
+    "autoprefixer": "^10.4.15",
+    "eslint": "^8.51.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-vue": "^9.17.0",
+    "nuxt": "^3.7.1",
+    "postcss": "^8.4.29",
+    "prettier": "^3.0.3",
+    "tailwindcss": "^3.3.3"
+  },
   "dependencies": {
     "child_process": "^1.0.2",
     "dayjs": "^1.11.10",
-    "fontmin": "^1.0.1"
+    "fontmin": "^1.0.1",
+    "sass": "^1.66.1",
+    "sass-loader": "^13.3.2"
   }
 }

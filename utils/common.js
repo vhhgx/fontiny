@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 const dayjs = require('dayjs')
 
 const fos = require('../utils/fos')
@@ -6,7 +6,6 @@ const config = require('../compress.config')
 
 /**
  * @function 标准路径拼接
- * 
  * @param {String} key 主目录名称
  * @param {Array} options 主目录内的子路径
  * @returns {String} 拼接后的绝对路径
@@ -30,7 +29,10 @@ const writeLogs = async function (message) {
   // log 路径
   const logsDir = path.join(process.cwd(), 'logs')
   // logs 文件路径
-  const logsFile = path.join(logsDir, `${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.log`);
+  const logsFile = path.join(
+    logsDir,
+    `${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.log`
+  )
 
   // 创建log目录
   new fos(logsDir).create()
@@ -40,8 +42,7 @@ const writeLogs = async function (message) {
   new fos(logsFile).append(message)
 }
 
-
 module.exports = {
   standardPath,
-  writeLogs
+  writeLogs,
 }
