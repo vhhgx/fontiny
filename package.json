@@ -27,13 +27,17 @@
     "nuxt": "^3.7.1",
     "postcss": "^8.4.29",
     "prettier": "^3.0.3",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.3.3",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.5"
   },
   "dependencies": {
     "child_process": "^1.0.2",
     "dayjs": "^1.11.10",
     "fontmin": "^1.0.1",
     "sass": "^1.66.1",
-    "sass-loader": "^13.3.2"
+    "sass-loader": "^13.3.2",
+    "vuesax": "^4.0.1-alpha.25",
+    "vuesax-alpha": "^0.0.1-alpha.3"
   }
 }
