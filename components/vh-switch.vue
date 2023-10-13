@@ -1,5 +1,4 @@
 <template>
-  <!-- <div> -->
   <div class="flex">
     <span>{{ title }}</span>
     <vs-switch :model="switchs">
@@ -7,7 +6,6 @@
       <template #on>{{ status.on }}</template>
     </vs-switch>
   </div>
-  <!-- </div> -->
 </template>
 
 <script setup>
@@ -20,7 +18,6 @@ const props = defineProps({
   }
 })
 
-// console.log('这里的', props)
 </script>
 
 <style></style>
