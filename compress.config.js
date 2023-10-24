@@ -12,7 +12,7 @@ module.exports = {
   convertSvg: false, // 是否转换为svg
 
   // NOTE 字形压缩
-  cn: '小楼昨夜听春雨深巷明朝卖杏花', // 中文内容，仅中文需要
+  cn: '小楼昨夜听春雨 深巷明朝卖杏花', // 中文内容，仅中文需要
   hinting: false, // 是否保留ttf提示信息。默认为true
 
   // NOTE woff相关
