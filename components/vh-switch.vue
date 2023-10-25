@@ -1,10 +1,16 @@
 <template>
   <div class="flex justify-between content-center py-1">
-    <div class="text-base text-zinc-700">{{ title }}</div>
+
+    <div class="flex">
+      <div class="text-base text-zinc-700 mr-3">{{ title }}</div>
+      <slot name="tip"></slot>
+    </div>
+
     <vs-switch v-model="keys">
       <template #off>{{ status.off }}</template>
       <template #on>{{ status.on }}</template>
     </vs-switch>
+
   </div>
 </template>
 
