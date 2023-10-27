@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   },
   alias: {
     '@': resolve(__dirname, '/'),
+    'components': resolve(__dirname, 'utils/components')
   },
   css: ['~/assets/styles/main.sass'],
   postcss: {
@@ -14,4 +15,5 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  modules: ['@element-plus/nuxt'],
 })

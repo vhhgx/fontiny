@@ -6,6 +6,47 @@
   font-style: normal;
 }
 
+/* 优设标题黑 */
+@font-face {
+  font-family: 'ysbth';
+  src: url('../fonts/ysbth.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* 阿里妈妈刀隶体 */
+@font-face {
+  font-family: 'daoli';
+  src: url('../fonts/daoli.ttf') format('truetype'),
+    url('../fonts/daoli.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* 霞鹜文楷 */
+@font-face {
+  font-family: 'xwwk';
+  src: url('../fonts/xwwk.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* 霞鹜漫黑 */
+@font-face {
+  font-family: 'xwmh';
+  src: url('../fonts/xwmh.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* 润植家 康熙字典 */
+@font-face {
+  font-family: 'kxzd';
+  src: url('../fonts/nzgr-kangxi.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
 /* Din */
 @font-face {
   font-family: 'din';
