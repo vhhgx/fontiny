@@ -10,7 +10,6 @@ const props = defineProps({
     default: 'linear'
   },
   color: String,
-
 })
 
 </script>

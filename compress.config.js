@@ -5,7 +5,7 @@ module.exports = {
 
   // NOTE 主进程相关
   increment: false, // 是否为增量压缩
-  langs: ['cn', 'en'], // 需要压缩的字体语言
+  langs: ['cn', 'en'], // 需要压缩的字体语言 没用上
 
   // NOTE 转换内容
   convertWoff: false, // 是否转换为woff
@@ -16,7 +16,7 @@ module.exports = {
   hinting: false, // 是否保留ttf提示信息。默认为true
 
   // NOTE woff相关
-  deflate: true, // 是否缩小woff，默认为false
+  deflate: true, // 是否缩小woff
 
   // NOTE CSS生成
   toCssBase64: false, // 是否开启base64压缩

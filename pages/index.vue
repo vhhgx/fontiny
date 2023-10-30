@@ -1,85 +1,24 @@
 <template>
   <div class="flex flex-1 px-72 gap-8">
     <div class="w-1/4">
-      <vh-page-cards title="文字信息">
+      <PageCards title="文字信息">
         <template #content>
-          <vh-tool-head-two title="文本内容" icon="linear-language-square">
-            <template #options>
-              <div class="select-none cursor-pointer" @click="showLongText">输入长文本</div>
-              <PageDialogs title="输入长文本" v-model="isShowLongText" @confirm="closeLongText">
-                <textarea type="text" class="vh-input " v-model="compressText" rows="8" />
-              </PageDialogs>
-            </template>
-          </vh-tool-head-two>
-          <div class="flex flex-1">
-            <input type="text" class="vh-input rounded-xl" v-model="compressText" :placeholder="inputHolder">
-          </div>
-          <vh-tool-head-two title="文字大小" icon="linear-language-square" class="pt-6">
-            <template #options>
-              <div class="text-zinc-500">{{ fontSize }}px</div>
-            </template>
-          </vh-tool-head-two>
-          <el-slider v-model="fontSize" :min="36" :max="120" style="--el-color-primary: rgb(25, 91, 255)" />
+          <PageForms :formList="textOptionsList"></PageForms>
         </template>
-      </vh-page-cards>
-
-      <vh-page-cards title="配置">
+      </PageCards>
+      <PageCards title="配置">
         <template #content>
-          <vh-tool-head-two title="压缩设置" icon="linear-candle-2">
-            <template #options>
-              <div class="select-none cursor-pointer" @click="showLongText">设置路径</div>
-              <PageDialogs title="输入长文本" v-model="isShowLongText" @confirm="closeLongText">
-                <textarea type="text" class="vh-input " v-model="compressText" rows="8" />
-              </PageDialogs>
-            </template>
-          </vh-tool-head-two>
-          <vh-tool-switch title="增量压缩" switchs="increment">
-            <template #tip>
-              <vh-tool-tip text="根据git记录压缩 add 状态的字体文件"></vh-tool-tip>
-            </template>
-          </vh-tool-switch>
+          <PageForms :formList="optionsList"></PageForms>
 
-          <vh-tool-head-two title="转换设置" icon="linear-candle-2" class="pt-6"></vh-tool-head-two>
-          <vh-tool-switch title="转换为woff" switchs="convertWoff">
-            <template #tip>
-              <vh-tool-tip text="默认转换为woff2，按需开启woff"></vh-tool-tip>
-            </template>
-          </vh-tool-switch>
-          <vh-tool-switch title="是否缩小woff" switchs="deflate" v-if="isDeflate">
-            <template #tip>
-              <vh-tool-tip text="优化woff体积"></vh-tool-tip>
-            </template>
-          </vh-tool-switch>
-          <vh-tool-switch title="转换为svg" switchs="convertSvg"></vh-tool-switch>
-          <vh-tool-switch title="保留ttf信息" switchs="hinting">
-            <template #tip>
-              <vh-tool-tip text="保证在低分辨率设备上小字号字体也清晰可读"></vh-tool-tip>
-            </template>
-          </vh-tool-switch>
-
-          <vh-tool-head-two title="CSS相关" icon="linear-candle-2" class="pt-6"></vh-tool-head-two>
-          <vh-tool-switch title="开启base64" switchs="toCssBase64">
-            <template #tip>
-              <vh-tool-tip text="将需要压缩字型的base64存入css文件"></vh-tool-tip>
-            </template>
-          </vh-tool-switch>
-          <vh-tool-switch title="使用本地字体" switchs="toCssLocal">
-            <template #tip>
-              <vh-tool-tip text="css文件引入文件路径"></vh-tool-tip>
-            </template>
-          </vh-tool-switch>
-          <div class="flex mt-2" v-if="isLocalPath">
-            <input type="text" class="flex vh-input rounded-xl" v-model="fontPath" placeholder="请输入本地字体路径">
-          </div>
           <vs-button @click="onStartCompress" size="large" border style="margin-top: 40px;">
             <BaseIcons icon="send-2"></BaseIcons>
             开始压缩
           </vs-button>
         </template>
-      </vh-page-cards>
+      </PageCards>
     </div>
     <div class="w-3/4">
-      <vh-page-cards title="示例字体">
+      <PageCards title="示例字体">
         <template #content>
           <div class="flex flex-col gap-4">
             <div v-for="font in exmFonts">
@@ -89,59 +28,160 @@
             </div>
           </div>
         </template>
-      </vh-page-cards>
+      </PageCards>
     </div>
   </div>
 </template>
 
 <script setup>
-// import dialogs from 'components/saxDialog'
+let compressText = useState('cn') // 字型内容
+let fontSize = ref(54) // 实例文字大小
 
-// 字型内容
-let compressText = useState('cn')
-const inputHolder = '请输入要提取的文本，长文本请开启文本框'
-// 是否开启本地字体路径
-const isLocalPath = useState('toCssLocal')
-// 是否缩小woff
-const isDeflate = useState('convertWoff')
-// 本地字体路径
-const fontPath = useState('toCssLoaclPath')
-
-// 实例文字大小
-let fontSize = ref(54)
-
-const isShowLongText = ref(false)
-
-// 打开弹窗
-const showLongText = () => {
-  isShowLongText.value = true
-}
-
-const closeLongText = () => {
-  isShowLongText.value = false
-}
-
+// 开始压缩
 const onStartCompress = () => {
-  const { data } = useFetch('/api/compress')
-  console.log('data', data)
+  console.log('111')
 }
 
+// 示例字体
 const exmFonts = [
   { name: '优设标题黑', icons: [{ text: '汉语' }, { text: '简体' }, { icon: 'emoji-happy', text: '可免费商用' }], family: 'ysbth' },
   { name: '阿里妈妈刀隶体', icons: [{ icon: 'emoji-happy', text: '可免费商用' }], family: 'daoli' },
   { name: '霞鹜漫黑', icons: [{ text: '汉语' }, { text: '简体' }], family: 'xwmh' },
-  { name: '润植家康熙字典', icons: [{ text: '汉语' }, { text: '繁体' }], family: 'kxzd' },
+  { name: '润植家康熙字典', icons: [{ text: '汉语' }, { text: '繁体' }], family: 'kxzd' }
 ]
+
+// 压缩配置
+const optionsList = reactive([
+  {
+    groupName: '压缩设置',
+    groupIcon: 'candle-2',
+    groupSlot: {
+      type: 'button',
+      text: '',
+    },
+    items: [
+      {
+        title: '增量压缩',
+        type: 'switch',
+        tip: '压缩Git暂存区的字体文件，关闭则为全量压缩',
+        isFull: false,
+        options: {
+          bind: useState('increment')
+        }
+      },
+      {
+        title: '转换为woff',
+        type: 'switch',
+        tip: '默认仅生成Woff2，开启则生成Woff同时优化体积',
+        isFull: false,
+        options: {
+          bind: useState('convertWoff')
+        }
+      },
+      {
+        title: '转换为svg',
+        type: 'switch',
+        tip: '是否生成SVG文件',
+        isFull: false,
+        options: {
+          bind: useState('convertSvg')
+        }
+      },
+      {
+        title: '保留ttf信息',
+        type: 'switch',
+        tip: '保证在低分辨率设备上小号字体也清晰可读',
+        isFull: false,
+        options: {
+          bind: useState('hinting')
+        }
+      }
+    ]
+  },
+  {
+    groupName: 'CSS设置',
+    groupIcon: 'css3',
+    groupSlot: {
+      type: 'button',
+      text: '',
+    },
+    items: [
+      {
+        title: '转换为base64',
+        type: 'switch',
+        tip: '将压缩后的字型base64存入css文件',
+        isFull: false,
+        options: {
+          bind: useState('toCssBase64')
+        }
+      },
+      {
+        title: '使用本地字体',
+        type: 'switch',
+        tip: 'css引入字体的路径，默认为本地，如需公网访问请填写公网地址',
+        isFull: false,
+        options: {
+          bind: useState('toCssLocal')
+        }
+      },
+      {
+        title: '使用本地字体',
+        type: 'input',
+        isFull: true,
+        options: {
+          bind: useState('toCssLoaclPath'),
+          linked: true,
+          linkedState: useState('toCssLocal'),
+          holder: '请输入本地字体路径'
+        }
+      }
+    ]
+  }
+])
+
+// 文字相关内容
+const textOptionsList = reactive([
+  {
+    groupName: '文本内容',
+    groupIcon: 'language-square',
+    groupSlot: {
+      type: 'button',
+      text: '',
+    },
+    items: [
+      {
+        type: 'input',
+        isFull: true,
+        options: {
+          bind: compressText,
+          holder: '请输入要提取的文本，点击右侧输入长文本'
+        }
+      }
+    ]
+  },
+  {
+    groupName: '文字大小',
+    groupIcon: 'language-square',
+    groupSlot: {
+      type: 'button',
+      text: '',
+    },
+    items: [
+      {
+        title: '转换为base64',
+        type: 'slider',
+        tip: '将压缩后的字型base64存入css文件',
+        isFull: true,
+        options: {
+          bind: fontSize
+        }
+      }
+    ]
+  }
+])
+
 </script>
 
 
 <style lang="sass">
-.vh-input
-  @apply rounded-xl resize-none
-  flex: 1
-  width: 100%
-  background: rgba(var(--vs-gray-2),1)
-  border: 2px solid transparent
-  color: rgba(var(--vs-text),1)
-  padding: 7px 13px 7px 10px
 </style>
