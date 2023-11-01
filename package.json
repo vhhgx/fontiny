@@ -39,6 +39,7 @@
     "sass": "^1.66.1",
     "sass-loader": "^13.3.2",
     "vuesax": "^4.0.1-alpha.25",
-    "vuesax-alpha": "^0.0.1-alpha.3"
+    "vuesax-alpha": "^0.0.1-alpha.3",
+    "ws": "^8.14.2"
   }
 }
