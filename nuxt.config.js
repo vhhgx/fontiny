@@ -9,9 +9,6 @@ export default defineNuxtConfig({
     '@': resolve(__dirname, '/'),
     components: resolve(__dirname, 'utils/components'),
   },
-  serverMiddleware: [
-    { path: '/ws', handler: path.resolve(__dirname, 'websocketServer.js') }, // 修改为你的 WebSocket 服务器文件路径
-  ],
   css: ['~/assets/styles/main.sass'],
   postcss: {
     plugins: {
