@@ -16,7 +16,7 @@ const inputRoute = path.resolve(
 // 创建目录
 
 // 源文件路径
-const sourceFilePath = 'assets/ysbth.ttf'
+const sourceFilePath = 'assets/fonts/ysbth.ttf'
 // 目标文件路径
 const targetFilePath = path.join(inputRoute, 'ysbth.ttf')
 

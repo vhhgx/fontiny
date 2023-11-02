@@ -33,8 +33,8 @@ const active = computed(() => {
 
 const navs = reactive([
   { id: 'home', name: '首页', url: '/' },
-  { id: 'logs', name: '日志', url: '/logs' },
-  { id: 'docs', name: '使用文档', url: '/docs' },
+  { id: 'logs', name: '日志', url: '/' },
+  { id: 'docs', name: '使用文档', url: '/' },
 ])
 
 const route = (url) => {

@@ -2,18 +2,6 @@
 
 一个基于[fontmin](https://github.com/ecomfe/fontmin)的批量字体字型提取压缩工具，目前仅支持`ttf`（或`otf`）转`woff`和`svg`
 
-- [ ] 搁这儿加一个压缩前后端对比
-
-## 功能
-
-- 中英文采用不同压缩策略
-  - 中文：字符提取后转换
-  - 英文：转为woff等格式
-- 支持基于git的增量或全量压缩
-- 较详尽的配置项，可见根目录`compress.config.js`文件
-- 压缩后会创建便于调用的`main.css`
-- 根据字体文件名称生成`font-family`，如有字重的区别，则除regular外会标记相应的字重
-
 ## 使用
 
 ### 安装
@@ -22,26 +10,38 @@
 
 ```shell
 # 克隆仓库
-git clone https://github.com/vhhgx/font_compression_tool.git
+git clone https://github.com/vhhgx/fontiny.git
 # 进入项目并安装依赖
-cd font_compression_tool && npm install
-# 执行初始化命令
-npm run init
+cd fontiny && npm install
+
+# 如果npm i报错，则需要单独安装element-plus后再执行npm i
+npm install -D @element-plus/nuxt
 ```
 
 ### 目录结构
 
+默认初始化创建`input`目录，结构为`语种/字体公司/字体名称/（属性，可选）/字重/字体文件`，以免费可商用的[优设标题黑](https://www.uisdc.com/font-empower#uisdc_font)为例，结果为`cn/youshe/biaotihei/regular/ysbth.ttf`
 
-默认初始化创建`input`目录，结构为`语种/字体公司/字体名称/字重/字体文件`，以免费可商用的[优设标题黑](https://www.uisdc.com/font-empower#uisdc_font)为例`cn/youshe/biaotihei/regular/ysbth.ttf`
+在某些书法字体中，区分简体和繁体两种属性。依然以标题黑为例，则结构变为`cn/youshe/biaotihei/simplified/regular/ysbth.ttf`
 
-在某些区分简繁体的书法字体中，结构则有所改变，以付费字体`方正宋刻本秀楷简体`为例`cn/fangzheng/songkeben/simplified/regular/fzqkb.ttf`
-
-压缩后，`output`目录将会保留原结构，因此`input`应按具体场景具体组织
+压缩后，`output`目录将会保留原结构，因此`input`应按具体场景具体组织。
 
 
-### 关于字重
+**需要注意**
 
-字重在字体设计和css中用于描述字体的粗细。尽管浏览器支持多种字重，但效果由字体决定。以下是常见的9个字重
+由于根据字体名称生成`font-family`属性，因此非同一字族的字体文件应保持**文件名唯一**
+
+
+## 开源引用
+
+- [vuesax-alpha](https://www.vuesax.space/components/checkbox.html#icon)：一个适用于Vue3的高颜值组件库
+- [fontmin](https://github.com/ecomfe/fontmin)：字型提取，字体格式转换工具
+- [element-plus](https://element-plus.org/zh-CN/)：饿了么官方Vue3组件库
+
+
+## 关于字重
+
+字重在字体设计和css中用于描述字体的粗细，以下是常见的9个字重
 
 
 | 字重名称    | 描述                       | weight |
@@ -57,32 +57,58 @@ npm run init
 | Black       | 最粗                       | 900    |
 
 
-在CSS中，可以使用font-weight属性指定字重。仅当字体提供特定字重时，浏览器才能正确渲染，否则浏览器会默认选择最接近的可用字重
+在CSS中，可以使用font-weight属性指定字重。尽管浏览器支持多种字重，但效果由字体决定。字体提供特定字重时，浏览器才能正确渲染，否则浏览器会默认选择最接近的可用字重
 
 
-## 关于版本
+## 版本
 
-- 0.1.0：命令行版本字型批量提取，发布于2023-10-11
+### Version 0.1.0
+
+命令行版本字型批量提取，发布于2023-10-11
+
+- 中英文采用不同压缩策略
+  - 中文：字符提取后转换
+  - 英文：转为woff等格式
+- 支持基于git的增量或全量压缩
+- 较详尽的配置项，可见根目录`compress.config.js`文件
+- 压缩后会创建便于调用的`main.css`
+- 根据字体文件名称生成`font-family`，如有字重的区别，则除regular外会标记相应的字重
 
 
-## 下个版本
+## TodoList & Bugs
 
-- [x] 使用Nuxt.js给项目添加UI层
-- [x] 配置文件的可视化
-- [ ] 在`output`查看压缩后字体的HTML输出
-- [ ] 作为npm包发布
-- [ ] 记录字体信息的JSON文件
-- [ ] 响应`input`目录变化
-- [ ] 可上传单个字体文件进行压缩（web端）
+### TodoList
 
-## 已知的问题和缺陷
+- [ ] 发布npm包
+- [ ] `input`目录添加记录字体信息的json
+- [ ] Card滚动条
+- [ ] 开始压缩按钮的悬浮
+- [ ] 路径设置的弹窗
+- [ ] 长文本弹窗
+- [ ] 如果文本输入框无内容，则右侧显示缺省
+- [ ] 封装弹窗
+- [ ] web端字体上传功能
+- [x] 接入websocket
+  - [ ] loading蒙层
+  - [ ] 转换进度、当前字体、待转换字体信息
+  - [ ] 转换出错的处理（比如白舟魂心无法提取字型等
+  - [ ] 日志文件的相关bug
+- [ ] 转换完成后，展示`output`中的字体
+  - [ ] 涉及到增量压缩的路径问题
+  - [ ] output中新增`index.html`，用于展示字体（和字体站联动）
+- [ ] 语言多选下拉框
+- [ ] 汉语字体的全量压缩（即不对字型进行提取）
+- [ ] svg转ttf和woff
+
+
+### Bugs
 
 - [ ] 日志的时间缓存问题
 - [ ] main.css地址配置
 
 ## 许可证
 
-根据MIT许可证进行许可
+[MIT](https://github.com/vhhgx/fontiny/blob/main/LICENSE)
 
 ## 致谢
 
