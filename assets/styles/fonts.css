@@ -23,14 +23,6 @@
   font-style: normal;
 }
 
-/* 霞鹜文楷 */
-@font-face {
-  font-family: 'xwwk';
-  src: url('../fonts/xwwk.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-}
-
 /* 霞鹜漫黑 */
 @font-face {
   font-family: 'xwmh';
