@@ -45,102 +45,33 @@
 let compressText = useState('cn') // 字型内容
 let fontSize = ref(54) // 实例文字大小
 
-// const { $socket } = useNuxtApp()
-// const uid = uuid()
+const { $socket } = useNuxtApp()
 
-// let ws
-
-// onMounted(() => {
-
-//   // $socket = new WebSocket('ws://localhost:端口号');
-
-//   $socket.onopen = function () {
-//     console.log('WebSocket 连接已打开');
-//   };
-
-//   $socket.onmessage = function (event) {
-//     console.log('从服务器接收到消息', event.data);
-//   };
-
-//   $socket.onerror = function (error) {
-//     console.error('WebSocket 错误', error);
-//   };
-
-//   $socket.onclose = function () {
-//     console.log('WebSocket 连接已关闭');
-//   };
-//   // const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-//   // ws = new WebSocket(`${wsProtocol}//${window.location.host}`);
-
-//   // $socket.onopen = () => console.log("connected");
-
-//   // ws.onmessage = ({ data }) => {
-//   //   console.log("data", data);
-//   // };
-//   // $socket.onopen = () => {
-//   //   $socket.send('12345')
-//   // }
-
-//   // $socket.onmessage = ({ data }) => {
-//   //   console.log("data", data)
-//   //   message.value = data
-//   // }
-//   // $socket.onclose = function () {
-//   //   console.log("disconnected")
-//   // }
-// })
-
-// const sendMessage = () => {
-
-//   console.log('发送详细', $socket, WebSocket.OPEN)
-//   if ($socket && $socket.readyState === WebSocket.OPEN) {
-//     $socket.send('这是来自客户端的消息');
-//   } else {
-//     console.error('WebSocket 连接未开启或已关闭');
-//   }
-// };
-
-const ws = ref(null)
-
+// 连接WebSocket
 const connectWebSocket = () => {
-  // 连接到服务器端提供的 WebSocket 端点
-  ws.value = new WebSocket('ws://localhost:8080')
-
-  ws.value.onopen = () => {
+  $socket.onopen = () => {
     console.log('WebSocket 连接成功')
   }
 
-  ws.value.onmessage = (event) => {
-    console.log('收到消息:', event.data)
+  $socket.onmessage = (event) => {
+    console.log('收到消息：', event.data)
   }
 
-  ws.value.onerror = (error) => {
-    console.error('WebSocket 出错:', error)
+  $socket.onerror = (error) => {
+    console.error('WebSocket 连接错误：', error)
   }
 
-  ws.value.onclose = () => {
+  $socket.onclose = () => {
     console.log('WebSocket 连接关闭')
   }
 }
 
-const sendMessage = async () => {
-  console.log('ws.value', ws.value, WebSocket.OPEN)
-
-  if (ws.value && ws.value.readyState === WebSocket.OPEN) {
-    ws.value.send('12322')
-  }
-}
-
 onMounted(connectWebSocket)
-// onUnmounted(() => {
-//   if (ws.value) {
-//     ws.value.close();
-//   }
-// });
 
-// 开始压缩
-const onStartCompress = () => {
-  console.log('111')
+// 执行压缩命令
+const sendMessage = async () => {
+  // const { data: testt } = await useFetch('/api/test')
+  // console.log('返回方法', testt)
 }
 
 // 示例字体
