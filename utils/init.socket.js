@@ -1,4 +1,5 @@
 import { WebSocketServer } from 'ws'
+import { processFiles } from './process'
 
 // 这儿问题在于wss 无法确保只被创建了一次
 
@@ -14,9 +15,11 @@ export function initializeWSS() {
       console.log('Client connected')
 
       // 监听消息事件
-      ws.on('message', (message) => {
-        console.log('Received:', message)
-        // 在这里你可以根据接收到的消息进行相应的处理
+      ws.on('message', (buffer) => {
+        let data = JSON.parse(buffer.toString())
+        if (data.task) {
+          processFiles(data.msg)
+        }
       })
 
       // 监听关闭事件

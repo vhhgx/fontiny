@@ -1,4 +1,4 @@
-import * as config from '../compress.config'
+import { config } from '../compress.config'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:created', async () => {

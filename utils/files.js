@@ -1,13 +1,12 @@
-const fs = require('fs').promises
+/** 所有的文件操作 */
+import fs from 'fs/promises'
 
-/**
- * 文件操作类，包括增删改查
- */
-class fileOperation {
+export const files = class {
   constructor(uri) {
     this.uri = uri
   }
 
+  // 创建文件
   async create(type = 'dir', options) {
     try {
       await fs.access(this.uri)
@@ -18,19 +17,17 @@ class fileOperation {
     }
   }
 
+  // 删除文件
   async delete() {
     try {
       await fs.unlink(this.uri)
-      // console.log(`File ${filePath} deleted successfully.`);
     } catch (error) {
       console.log('发生错误')
-      // console.error(`Error deleting file ${filePath}:`, error);
     }
   }
 
+  // 往文件写入内容
   async append(message) {
     await fs.appendFile(this.uri, message, 'utf8')
   }
 }
-
-module.exports = fileOperation

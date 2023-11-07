@@ -11,7 +11,7 @@
           <PageForms :formList="optionsList"></PageForms>
 
           <vs-button
-            @click="sendMessage"
+            @click="onStartCompress"
             size="large"
             border
             style="margin-top: 40px">
@@ -37,13 +37,17 @@
           </div>
         </template>
       </PageCards>
+      <div>{{ loadingText }}</div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { config } from '../compress.config'
 let compressText = useState('cn') // 字型内容
 let fontSize = ref(54) // 实例文字大小
+
+const loadingText = ref('') // 等待文字
 
 const { $socket } = useNuxtApp()
 
@@ -55,6 +59,7 @@ const connectWebSocket = () => {
 
   $socket.onmessage = (event) => {
     console.log('收到消息：', event.data)
+    loadingText.value = event.data
   }
 
   $socket.onerror = (error) => {
@@ -69,9 +74,15 @@ const connectWebSocket = () => {
 onMounted(connectWebSocket)
 
 // 执行压缩命令
-const sendMessage = async () => {
-  // const { data: testt } = await useFetch('/api/test')
-  // console.log('返回方法', testt)
+const onStartCompress = async () => {
+  // NOTE 这里要先执行上面的校验
+
+  Object.keys(config).forEach((item) => {
+    config[item] = useState(item).value
+  })
+
+  const msg = { task: true, msg: config }
+  $socket.send(JSON.stringify(msg))
 }
 
 // 示例字体

@@ -1,4 +1,4 @@
-module.exports = {
+export const config = {
   // NOTE 路径相关
   input: 'input', // 字体存放路径
   output: 'output', // 压缩后字体存放路径
