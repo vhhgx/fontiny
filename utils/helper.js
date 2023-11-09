@@ -88,5 +88,9 @@ export const sender = (msg) => {
     return client.readyState === 1
   })
 
-  sender.send(msg)
+  if (typeof msg === 'object') {
+    sender.send(JSON.stringify(msg))
+  } else {
+    sender.send(msg)
+  }
 }

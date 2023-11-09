@@ -121,14 +121,22 @@ export const extractify = async (_path, conf, opts) => {
       opts.idx + 1
     }\n`
   )
-  sender(`正在压缩 ${relative} 共${opts.count} 当前 ${opts.idx}`)
+
+  const senderMsg = {
+    path: relative,
+    name: fileName,
+    count: opts.count,
+    curIdx: opts.idx + 1,
+  }
+
+  sender({ code: 200, msg: senderMsg })
 
   return new Promise((resolve, reject) => {
     fontmin.run((err) => {
       if (err) {
-        reject(`${relative} 发生错误`)
+        reject({ code: 500, msg: `${relative} 发生错误` })
       }
-      resolve(`${relative} 转换完成`)
+      resolve({ code: 201, msg: `${relative} 转换完成` })
     })
   })
 }

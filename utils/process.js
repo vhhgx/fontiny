@@ -38,7 +38,7 @@ export const processFiles = async (configs) => {
   }
 
   // 执行获取文件函数
-  sender('正在查找需要压缩的文件')
+  sender({ code: 200, msg: '正在查找需要压缩的文件' })
   await new files(logsFilePath).append(
     `${dayjs().format('HH:mm:ss')} 查找需要压缩的文件\n`
   )
@@ -48,7 +48,7 @@ export const processFiles = async (configs) => {
       allFiles.length
     } 个字体，准备压缩\n`
   )
-  sender(`查找完成，共 ${allFiles.length} 个字体，准备压缩`)
+  sender({ code: 200, msg: `查找完成，共 ${allFiles.length} 个字体，准备压缩` })
 
   configs['logsFilePath'] = logsFilePath
 
@@ -56,15 +56,18 @@ export const processFiles = async (configs) => {
     const item = allFiles[i]
     await extractify(item, configs, { idx: i, count: allFiles.length }).then(
       async (res) => {
-        sender(res)
+        if (res.code !== 201) {
+          sender(res)
+        }
+
         await new files(logsFilePath).append(
-          `${dayjs().format('HH:mm:ss')} ${res}\n`
+          `${dayjs().format('HH:mm:ss')} ${res.msg}\n`
         )
       }
     )
   }
 
-  sender('全部压缩完成')
+  sender({ code: 210, msg: { count: allFiles.length } })
   await new files(logsFilePath).append(
     `${dayjs().format('HH:mm:ss')} 全部压缩完成\n`
   )
