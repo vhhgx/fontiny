@@ -13,6 +13,7 @@ export const fontinyConfigSchema = z
     formats: z.array(formatSchema).optional(),
     css: z.union([z.boolean(), z.record(z.string(), z.unknown())]).optional(),
     manifest: z.union([z.boolean(), z.record(z.string(), z.unknown())]).optional(),
+    watch: z.boolean().optional(),
     iconfont: z
       .object({
         input: z.string().optional(),
@@ -22,6 +23,7 @@ export const fontinyConfigSchema = z
         css: z.boolean().optional(),
         types: z.boolean().optional(),
         startCodepoint: z.number().optional(),
+        codepoints: z.string().optional(),
       })
       .optional(),
   })

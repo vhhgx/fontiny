@@ -1,4 +1,5 @@
 import pc from 'picocolors'
+import fs from 'fs-extra'
 import { iconfont, type IconfontFormat } from '../iconfont/index.js'
 import type { FontinyConfig } from '../config/schema.js'
 import { parseCodepoint, parseList } from './common.js'
@@ -10,6 +11,7 @@ type IconfontCommandOptions = {
   css?: boolean
   types?: boolean
   startCodepoint?: string
+  codepoints?: string
 }
 
 export async function runIconfontCommand(input: string, options: IconfontCommandOptions, config: FontinyConfig) {
@@ -24,6 +26,7 @@ export async function runIconfontCommand(input: string, options: IconfontCommand
     .css(options.css ?? iconConfig.css ?? true)
     .types(options.types ?? iconConfig.types ?? false)
     .startCodepoint(parseCodepoint(options.startCodepoint) ?? iconConfig.startCodepoint ?? 0xe001)
+    .codepoints(options.codepoints ?? iconConfig.codepoints)
     .dest(options.out ?? iconConfig.output ?? 'output/icons')
     .run()
 

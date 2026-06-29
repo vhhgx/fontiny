@@ -52,6 +52,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "chokidar": "^3.6.0",
     "commander": "^14.0.2",
     "fast-glob": "^3.3.3",
     "fonteditor-core": "^2.6.3",

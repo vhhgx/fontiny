@@ -1,4 +1,5 @@
 import path from 'node:path'
+import fs from 'fs-extra'
 import type svgtofont from 'svgtofont'
 import type { SvgToFontOptions } from 'svgtofont'
 
@@ -15,6 +16,7 @@ export class IconfontPipeline {
   private shouldGenerateCss: boolean | SvgToFontOptions['css'] = true
   private shouldGenerateTypes: SvgToFontOptions['typescript'] = false
   private start = 0xe001
+  private codepointsFile?: string
   private extraOptions: Partial<SvgToFontOptions> = {}
 
   constructor(options: { cwd?: string } = {}) {
@@ -51,6 +53,11 @@ export class IconfontPipeline {
     return this
   }
 
+  codepoints(filePath?: string) {
+    this.codepointsFile = filePath
+    return this
+  }
+
   dest(output: string) {
     this.output = output
     return this
@@ -68,6 +75,10 @@ export class IconfontPipeline {
       return format === 'eot' || format === 'symbol.svg' || !this.outputFormats.includes(format)
     })
 
+    const codepoints = this.codepointsFile
+      ? await fs.readJson(path.resolve(this.cwd, this.codepointsFile))
+      : undefined
+
     return svgtofont({
       src: path.resolve(this.cwd, this.input),
       dist: path.resolve(this.cwd, this.output),
@@ -79,6 +90,18 @@ export class IconfontPipeline {
       website: null as unknown as SvgToFontOptions['website'],
       emptyDist: false,
       excludeFormat,
+      ...(codepoints
+        ? {
+            getIconUnicode: (name) => {
+              const value = codepoints[name]
+              if (!value) {
+                return undefined as unknown as [string, number]
+              }
+              const codepoint = Number.parseInt(String(value).replace(/^U\+|^0x/i, ''), 16)
+              return [String.fromCodePoint(codepoint), codepoint]
+            },
+          }
+        : {}),
       ...this.extraOptions,
     })
   }

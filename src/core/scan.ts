@@ -2,11 +2,12 @@ import path from 'node:path'
 import fs from 'fs-extra'
 import fg from 'fast-glob'
 import type { FontinyAsset, FontinyFormat } from './asset.js'
+import { getFontFormat } from './format.js'
 
 const fontExtensions = new Set(['ttf', 'otf', 'woff', 'woff2', 'svg'])
 
 const normalizeExt = (filePath: string) => {
-  return path.extname(filePath).slice(1).toLowerCase() as FontinyFormat
+  return getFontFormat(filePath) as FontinyFormat
 }
 
 export const isSupportedFont = (filePath: string) => {

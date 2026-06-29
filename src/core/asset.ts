@@ -21,12 +21,23 @@ export type FontinyAsset = {
     fontFamily?: string
     glyphCount?: number
     subsetText?: string
+    subsetUnicodes?: number[]
+    fontWeight?: number
+    fontStyle?: string
   }
+}
+
+export type FontinyOutputResult = {
+  path: string
+  size: number
+  format?: FontinyOutputKind
 }
 
 export type FontinyFileResult = {
   input: string
+  originalSize: number
   outputs: string[]
+  outputDetails: FontinyOutputResult[]
 }
 
 export type FontinyRunError = {

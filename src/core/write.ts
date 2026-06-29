@@ -16,16 +16,26 @@ export async function writeAssetOutputs(
   asset: FontinyAsset
 ): Promise<FontinyFileResult> {
   const outputs: string[] = []
+  const outputDetails: FontinyFileResult['outputDetails'] = []
 
   for (const output of asset.outputs.values()) {
     const targetPath = outputPathFor(outputDir, asset, output.filename)
     await fs.ensureDir(path.dirname(targetPath))
     await fs.writeFile(targetPath, output.contents)
     outputs.push(targetPath)
+    outputDetails.push({
+      path: targetPath,
+      size: Buffer.isBuffer(output.contents)
+        ? output.contents.length
+        : Buffer.byteLength(output.contents),
+      format: output.kind,
+    })
   }
 
   return {
     input: asset.inputPath,
+    originalSize: asset.originalBuffer.length,
     outputs,
+    outputDetails,
   }
 }

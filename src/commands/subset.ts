@@ -2,7 +2,7 @@ import pc from 'picocolors'
 import Fontiny from '../index.js'
 import { css, manifest } from '../plugins/index.js'
 import type { FontinyConfig } from '../config/schema.js'
-import { parseFormats, parseUnicodes } from './common.js'
+import { parseFormats, parseUnicodes, printSizeReport } from './common.js'
 
 type SubsetCommandOptions = {
   text?: string
@@ -12,6 +12,8 @@ type SubsetCommandOptions = {
   out?: string
   css?: boolean
   manifest?: boolean
+  report?: boolean
+  watch?: boolean
 }
 
 export async function runSubsetCommand(input: string, options: SubsetCommandOptions, config: FontinyConfig) {
@@ -35,6 +37,9 @@ export async function runSubsetCommand(input: string, options: SubsetCommandOpti
 
   const result = await pipeline.run()
   console.log(pc.green(`Processed ${result.files.length} font file(s).`))
+  if (options.report !== false) {
+    printSizeReport(result)
+  }
   if (result.errors.length > 0) {
     console.log(pc.yellow(`${result.errors.length} file(s) failed.`))
   }

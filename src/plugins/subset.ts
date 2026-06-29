@@ -59,6 +59,7 @@ export function subset(options: SubsetOptions): FontinyPlugin {
       asset.currentType = 'ttf'
       asset.meta.subsetText = options.text
       asset.meta.glyphCount = subsetCodePoints.length
+      asset.meta.subsetUnicodes = subsetCodePoints
     },
   }
 }

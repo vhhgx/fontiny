@@ -16,7 +16,7 @@ export async function createFont(buffer: Buffer, type: FontinyFormat, options = 
     await ensureWoff2()
   }
 
-  return Font.create(buffer, {
+  return Font.create(type === 'svg' ? buffer.toString('utf8') : buffer, {
     type,
     ...options,
   })

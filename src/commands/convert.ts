@@ -1,11 +1,13 @@
 import pc from 'picocolors'
 import Fontiny from '../index.js'
-import { parseFormats } from './common.js'
+import { parseFormats, printSizeReport } from './common.js'
 import type { FontinyConfig } from '../config/schema.js'
 
 type ConvertCommandOptions = {
   formats?: string
   out?: string
+  report?: boolean
+  watch?: boolean
 }
 
 export async function runConvertCommand(input: string, options: ConvertCommandOptions, config: FontinyConfig) {
@@ -16,6 +18,9 @@ export async function runConvertCommand(input: string, options: ConvertCommandOp
     .run()
 
   console.log(pc.green(`Converted ${result.files.length} font file(s).`))
+  if (options.report !== false) {
+    printSizeReport(result)
+  }
   if (result.errors.length > 0) {
     console.log(pc.yellow(`${result.errors.length} file(s) failed.`))
   }

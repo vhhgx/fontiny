@@ -13,9 +13,14 @@ export function manifest(options: ManifestOptions = {}): FontinyPlugin {
       const files = assets.map((asset) => ({
         input: asset.inputPath,
         family: asset.meta.fontFamily ?? asset.basename,
-        outputs: [...asset.outputs.values()].map((output) =>
-          ctx.resolveOutputPath(asset, output.filename)
-        ),
+        originalSize: asset.originalBuffer.length,
+        outputs: [...asset.outputs.values()].map((output) => ({
+          path: ctx.resolveOutputPath(asset, output.filename),
+          format: output.kind,
+          size: Buffer.isBuffer(output.contents)
+            ? output.contents.length
+            : Buffer.byteLength(output.contents),
+        })),
       }))
 
       await fs.ensureDir(ctx.outputDir)

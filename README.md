@@ -50,6 +50,14 @@ fontiny convert "input/**/*.{ttf,otf,woff,woff2}" \
   --out output
 ```
 
+Subset and convert commands print a size report by default:
+
+```text
+assets/fonts/ysbth.ttf
+  original: 1.3 MB
+  woff2: 1.0 KB (99.9% reduced)
+```
+
 ### Generate Iconfont
 
 ```bash
@@ -59,6 +67,56 @@ fontiny iconfont icons \
   --out output/icons \
   --css \
   --types
+```
+
+Use a fixed codepoint map to keep icon unicode values stable:
+
+```bash
+fontiny iconfont icons \
+  --name fontiny-icons \
+  --codepoints iconfont.json \
+  --out output/icons
+```
+
+### Inspect Fonts
+
+```bash
+fontiny inspect output/assets/fonts/ysbth.woff2 --unicodes
+```
+
+### Check Text Coverage
+
+```bash
+fontiny check output/assets/fonts/ysbth.woff2 --text "你好Fontiny"
+```
+
+### Collect Text From Source
+
+```bash
+fontiny collect "src/**/*.{vue,ts,tsx,html,md}" --out chars.txt
+fontiny subset input/font.ttf --text-file chars.txt --formats woff2 --out output
+```
+
+### Preview Output
+
+Preview starts a temporary local server instead of generating a new HTML file every time:
+
+```bash
+fontiny preview output --text "你好Fontiny"
+```
+
+### Initialize Config
+
+```bash
+fontiny init
+```
+
+### Watch Mode
+
+```bash
+fontiny subset "input/**/*.ttf" --text-file chars.txt --watch
+fontiny convert "input/**/*.ttf" --formats woff2 --watch
+fontiny iconfont icons --watch
 ```
 
 ## SDK
@@ -81,16 +139,26 @@ await Fontiny()
 
 ```ts
 import Fontiny from 'fontiny'
-import { subset, convert, css, manifest } from 'fontiny/plugins'
+import { subset, convert, css, manifest, rename } from 'fontiny/plugins'
 
 await Fontiny()
   .src('input/**/*.{ttf,otf}')
   .use(subset({ text: '小楼一夜听春雨' }))
+  .use(rename({ family: 'MyFont' }))
   .use(convert({ formats: ['ttf', 'woff', 'woff2', 'svg'] }))
-  .use(css({ fontFamily: 'MyFont' }))
+  .use(css({ fontFamily: 'MyFont', unicodeRange: true }))
   .use(manifest())
   .dest('output')
   .run()
+```
+
+### Inspect and Check API
+
+```ts
+import { hasText, inspectFont } from 'fontiny'
+
+const font = await inspectFont('output/assets/fonts/ysbth.woff2')
+const result = hasText(font, '你好Fontiny')
 ```
 
 ### Iconfont API
@@ -120,6 +188,7 @@ export default {
   formats: ['woff2'],
   css: true,
   manifest: true,
+  watch: false,
   iconfont: {
     input: 'icons',
     output: 'output/icons',
@@ -127,7 +196,8 @@ export default {
     formats: ['ttf', 'woff', 'woff2', 'svg'],
     css: true,
     types: true,
-    startCodepoint: 0xe001
+    startCodepoint: 0xe001,
+    codepoints: 'iconfont.json'
   }
 }
 ```
