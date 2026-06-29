@@ -13,15 +13,36 @@ export const isSupportedFont = (filePath: string) => {
   return fontExtensions.has(normalizeExt(filePath))
 }
 
-export async function resolveAssets(patterns: string[], cwd: string): Promise<FontinyAsset[]> {
-  const entries = await fg(patterns, {
-    cwd,
-    absolute: true,
-    onlyFiles: true,
-    unique: true,
-  })
+const toAbsolutePath = (pattern: string, cwd: string) => {
+  return path.isAbsolute(pattern) ? pattern : path.resolve(cwd, pattern)
+}
 
-  const fontFiles = entries.filter(isSupportedFont).sort()
+export async function resolveAssets(patterns: string[], cwd: string): Promise<FontinyAsset[]> {
+  const directFiles: string[] = []
+  const globPatterns: string[] = []
+
+  for (const pattern of patterns) {
+    if (!fg.isDynamicPattern(pattern)) {
+      const filePath = toAbsolutePath(pattern, cwd)
+      if ((await fs.pathExists(filePath)) && (await fs.stat(filePath)).isFile()) {
+        directFiles.push(filePath)
+        continue
+      }
+    }
+
+    globPatterns.push(pattern)
+  }
+
+  const globFiles = globPatterns.length
+    ? await fg(globPatterns, {
+        cwd,
+        absolute: true,
+        onlyFiles: true,
+        unique: true,
+      })
+    : []
+
+  const fontFiles = [...new Set([...directFiles, ...globFiles])].filter(isSupportedFont).sort()
 
   return Promise.all(
     fontFiles.map(async (inputPath) => {

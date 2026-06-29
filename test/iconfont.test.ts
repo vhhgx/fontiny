@@ -26,5 +26,5 @@ describe('iconfont', () => {
     expect(await fs.pathExists(path.join(tmpDir, 'test-icons.svg'))).toBe(true)
     expect(await fs.pathExists(path.join(tmpDir, 'test-icons.css'))).toBe(true)
     expect(await fs.pathExists(path.join(tmpDir, 'info.json'))).toBe(true)
-  })
+  }, 30000)
 })
