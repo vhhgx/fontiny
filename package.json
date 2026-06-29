@@ -1,45 +1,74 @@
 {
   "name": "fontiny",
-  "version": "0.1.0",
-  "description": "一个基于fontmin的批量字体字型提取压缩工具",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:tiny": "node src/index.js",
-    "init": "node src/init.js",
-    "build": "nuxt build",
-    "dev": "nuxt dev --host",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+  "version": "0.2.0",
+  "description": "A Node.js SDK and CLI for font subsetting, conversion, and iconfont generation.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "fontiny": "./dist/cli.js"
   },
-  "keywords": [],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./plugins": {
+      "types": "./dist/plugins/index.d.ts",
+      "import": "./dist/plugins/index.js",
+      "require": "./dist/plugins/index.cjs"
+    },
+    "./iconfont": {
+      "types": "./dist/iconfont/index.d.ts",
+      "import": "./dist/iconfont/index.js",
+      "require": "./dist/iconfont/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pack:dry": "npm pack --dry-run"
+  },
+  "keywords": [
+    "font",
+    "subset",
+    "woff",
+    "woff2",
+    "iconfont",
+    "cli"
+  ],
   "author": "vhhgx",
   "license": "MIT",
-  "devDependencies": {
-    "@babel/eslint-parser": "^7.22.15",
-    "@element-plus/nuxt": "^1.0.6",
-    "@nuxt/devtools": "latest",
-    "autoprefixer": "^10.4.15",
-    "eslint": "^8.51.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-vue": "^9.17.0",
-    "nuxt": "^3.7.1",
-    "postcss": "^8.4.29",
-    "prettier": "^3.0.3",
-    "tailwindcss": "^3.3.3",
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.5"
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
-    "child_process": "^1.0.2",
-    "dayjs": "^1.11.10",
-    "fontmin": "^1.0.1",
-    "sass": "^1.66.1",
-    "sass-loader": "^13.3.2",
-    "vuesax": "^4.0.1-alpha.25",
-    "vuesax-alpha": "^0.0.1-alpha.3",
-    "ws": "^8.14.2"
+    "commander": "^14.0.2",
+    "fast-glob": "^3.3.3",
+    "fonteditor-core": "^2.6.3",
+    "fs-extra": "^11.3.2",
+    "picocolors": "^1.1.1",
+    "svgtofont": "^6.0.3",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.10.1",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
   }
 }
