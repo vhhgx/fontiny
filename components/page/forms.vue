@@ -65,7 +65,9 @@ const props = defineProps({
 
 const showInput = (item) => {
   let opt = item.options
-  return opt.linked ? opt.linked === true && opt.linkedState === true : true
+  return opt.linked
+    ? opt.linked === true && (opt.linkedState?.value ?? opt.linkedState) === true
+    : true
 }
 
 const val = ref('')

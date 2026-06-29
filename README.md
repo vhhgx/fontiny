@@ -119,6 +119,23 @@ fontiny convert "input/**/*.ttf" --formats woff2 --watch
 fontiny iconfont icons --watch
 ```
 
+### Optional fontTools Engine
+
+The default engine is built in and does not require Python. For higher-fidelity subsetting with fontTools, install it yourself and opt in:
+
+```bash
+pip install fonttools brotli
+fontiny subset input/font.ttf --engine fonttools --text-file chars.txt --formats ttf,woff2 --out output
+```
+
+If `pyftsubset` is unavailable, Fontiny prints:
+
+```text
+fontTools engine is not available.
+Install with: pip install fonttools brotli
+Or use default engine: --engine builtin
+```
+
 ## SDK
 
 ### Convenience API
@@ -186,6 +203,7 @@ export default {
   output: 'output',
   text: '小楼一夜听春雨 深巷明朝卖杏花',
   formats: ['woff2'],
+  engine: 'builtin',
   css: true,
   manifest: true,
   watch: false,
@@ -203,6 +221,33 @@ export default {
 ```
 
 CLI flags override config values.
+
+## Nuxt Server API
+
+The repository includes Nuxt server routes that call the SDK directly:
+
+```ts
+await $fetch('/api/fontiny/subset', {
+  method: 'POST',
+  body: {
+    input: 'input/**/*.{ttf,otf}',
+    output: 'output',
+    text: '你好Fontiny',
+    formats: ['woff2'],
+    css: true,
+    manifest: true
+  }
+})
+```
+
+Additional routes:
+
+```text
+GET  /api/fontiny/inspect?file=output/font.woff2
+POST /api/fontiny/check
+```
+
+The previous WebSocket task runner on port `8080` has been removed.
 
 ## Development
 

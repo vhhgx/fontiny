@@ -28,16 +28,16 @@
               </div>
 
               <div class="text-xl my-4 mt-16" style="color: rgb(25, 91, 255)">
-                正在处理 {{ wsContent.msg.name }}
+                正在处理 {{ taskContent.msg.name }}
               </div>
 
               <div class="text-zinc-400 flex flex-col gap-1">
-                <span>{{ wsContent.msg.path }}</span>
+                <span>{{ taskContent.msg.path }}</span>
                 <span>
                   共
-                  <span class="font-bold">{{ wsContent.msg.count }}</span>
+                  <span class="font-bold">{{ taskContent.msg.count }}</span>
                   个文件，当前第
-                  <span class="font-bold">{{ wsContent.msg.curIdx }}</span> 个
+                  <span class="font-bold">{{ taskContent.msg.curIdx }}</span> 个
                 </span>
               </div>
             </div>
@@ -55,7 +55,7 @@
               </div>
 
               <div class="text-zinc-400 flex gap-1">
-                共<span class="font-bold">{{ wsContent.msg.count }}</span
+                共<span class="font-bold">{{ taskContent.msg.count }}</span
                 >个文件
                 <span class="ml-2">
                   <a
@@ -121,51 +121,77 @@
 </template>
 
 <script setup>
-import { config } from '../compress.config'
 import { examples } from '../texts'
 
 const isExtractify = ref(false) // 是否正在压缩，控制弹窗
 const isFinish = ref(false) //是否压缩完成
-let compressText = useState('cn') // 字型内容
+let compressText = useState(
+  'cn',
+  () => '小楼一夜听春雨 深巷明朝卖杏花'
+) // 字型内容
 let fontSize = ref(54) // 实例文字大小
 
-const wsContent = reactive({}) // 等待文字
+const increment = useState('increment', () => false)
+const convertWoff = useState('convertWoff', () => false)
+const convertSvg = useState('convertSvg', () => false)
+const hinting = useState('hinting', () => false)
+const toCssBase64 = useState('toCssBase64', () => false)
+const toCssLocal = useState('toCssLocal', () => true)
+const toCssLoaclPath = useState(
+  'toCssLoaclPath',
+  () => 'https://cdn.jsdelivr.net/gh/vhhgx/minimized_fonts/'
+)
 
-const { $socket } = useNuxtApp()
-
-// 连接WebSocket
-const connectWebSocket = () => {
-  $socket.onopen = () => {
-    console.log('WebSocket 连接成功')
-  }
-
-  $socket.onmessage = (event) => {
-    let recevied = JSON.parse(event.data)
-    wsContent.msg = recevied.msg
-
-    if (recevied.code === 210) {
-      isFinish.value = true
-    }
-  }
-
-  $socket.onerror = (error) => {
-    console.error('WebSocket 连接错误：', error)
-  }
-
-  $socket.onclose = () => {
-    console.log('WebSocket 连接关闭')
-  }
-}
-
-onMounted(connectWebSocket)
+const taskContent = reactive({
+  msg: {
+    name: '',
+    path: '正在查找需要压缩的字体',
+    count: 0,
+    curIdx: 0,
+  },
+})
 
 // 执行压缩命令
 const onStartCompress = async () => {
   // NOTE 这里要先执行上面的校验
   isFinish.value = false
   isExtractify.value = true
-  const msg = { task: true, msg: config }
-  $socket.send(JSON.stringify(msg))
+
+  const formats = ['woff2']
+  if (convertWoff.value) formats.push('woff')
+  if (convertSvg.value) formats.push('svg')
+
+  taskContent.msg = {
+    name: '字体压缩任务',
+    path: '正在处理 input 目录',
+    count: 0,
+    curIdx: 0,
+  }
+
+  const result = await $fetch('/api/fontiny/subset', {
+    method: 'POST',
+    body: {
+      input: 'input/**/*.{ttf,otf,woff,woff2}',
+      output: 'output',
+      text: compressText.value,
+      formats,
+      hinting: hinting.value,
+      css: {
+        base64: toCssBase64.value,
+        local: toCssLocal.value,
+        basePath: toCssLocal.value ? '.' : toCssLoaclPath.value,
+      },
+      manifest: true,
+    },
+  })
+
+  taskContent.msg = {
+    name: '字体压缩任务',
+    path: 'output',
+    count: result.files?.length ?? 0,
+    curIdx: result.files?.length ?? 0,
+  }
+  isFinish.value = true
 }
 
 const onCloseLoading = () => {
@@ -188,7 +214,7 @@ const optionsList = reactive([
         tip: '压缩Git暂存区的字体文件，关闭则为全量压缩',
         isFull: false,
         options: {
-          bind: useState('increment'),
+          bind: increment,
         },
       },
       {
@@ -197,7 +223,7 @@ const optionsList = reactive([
         tip: '默认仅生成Woff2，开启则生成Woff同时优化体积',
         isFull: false,
         options: {
-          bind: useState('convertWoff'),
+          bind: convertWoff,
         },
       },
       {
@@ -206,7 +232,7 @@ const optionsList = reactive([
         tip: '是否生成SVG文件',
         isFull: false,
         options: {
-          bind: useState('convertSvg'),
+          bind: convertSvg,
         },
       },
       {
@@ -215,7 +241,7 @@ const optionsList = reactive([
         tip: '保证在低分辨率设备上小号字体也清晰可读',
         isFull: false,
         options: {
-          bind: useState('hinting'),
+          bind: hinting,
         },
       },
     ],
@@ -234,7 +260,7 @@ const optionsList = reactive([
         tip: '将压缩后的字型base64存入css文件',
         isFull: false,
         options: {
-          bind: useState('toCssBase64'),
+          bind: toCssBase64,
         },
       },
       {
@@ -243,7 +269,7 @@ const optionsList = reactive([
         tip: 'css引入字体的路径，默认为本地，如需公网访问请填写公网地址',
         isFull: false,
         options: {
-          bind: useState('toCssLocal'),
+          bind: toCssLocal,
         },
       },
       {
@@ -251,9 +277,9 @@ const optionsList = reactive([
         type: 'input',
         isFull: true,
         options: {
-          bind: useState('toCssLoaclPath'),
+          bind: toCssLoaclPath,
           linked: true,
-          linkedState: useState('toCssLocal'),
+          linkedState: toCssLocal,
           holder: '请输入本地字体路径',
         },
       },

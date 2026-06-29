@@ -11,6 +11,7 @@ export const fontinyConfigSchema = z
     textFile: z.string().optional(),
     unicodes: z.array(z.number()).optional(),
     formats: z.array(formatSchema).optional(),
+    engine: z.enum(['builtin', 'fonttools']).optional(),
     css: z.union([z.boolean(), z.record(z.string(), z.unknown())]).optional(),
     manifest: z.union([z.boolean(), z.record(z.string(), z.unknown())]).optional(),
     watch: z.boolean().optional(),

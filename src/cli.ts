@@ -31,6 +31,7 @@ program
   .option('--manifest', 'generate fontiny.manifest.json')
   .option('--no-report', 'disable size report')
   .option('--watch', 'watch input and rerun')
+  .option('--engine <engine>', 'font engine: builtin or fonttools', 'builtin')
   .action(async (input, options) => {
     const config = await loadConfig(program.opts().config)
     await runWithWatch([input, options.textFile, program.opts().config].filter(Boolean), () =>
