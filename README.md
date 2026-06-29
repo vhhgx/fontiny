@@ -1,37 +1,47 @@
 # Fontiny
 
-Fontiny is a Node.js SDK and CLI for font subsetting, font conversion, and SVG iconfont generation.
+Fontiny 是一个面向 Node.js 的字体处理 SDK 和 CLI 工具，用于字体子集化、字体格式转换、SVG 图标转 iconfont，以及字体产物校验。
 
-The v0.2 line is focused on a publishable npm package:
+当前版本重点是把 Fontiny 做成一个可以发布到 npm 的工具包。默认引擎不依赖 Fontmin、Python、fontTools 或系统字体工具；需要更高保真子集化时，也可以显式启用可选的 fontTools 引擎。
 
-- Subset `ttf`, `otf`, `woff`, and `woff2` fonts.
-- Convert fonts to `ttf`, `woff`, `woff2`, and SVG font output.
-- Generate icon fonts from SVG icon directories.
-- Use a Fontmin-like chainable SDK.
-- Use the same engine from CLI, Node scripts, or Nuxt server routes.
+## 已完成功能
 
-Fontiny does not require Fontmin, Python, fontTools, or system font binaries for the default engine.
+- 支持 `ttf`、`otf`、`woff`、`woff2` 输入。
+- 支持字体子集化，按文本、文本文件或 unicode 列表裁剪字体。
+- 支持输出 `ttf`、`woff`、`woff2`、SVG font。
+- 支持 SVG 图标目录生成 iconfont。
+- 支持固定 iconfont codepoint，避免图标 unicode 变化。
+- 提供 Fontmin 风格链式 SDK：`.src().use().dest().run()`。
+- 提供便捷 SDK：`.text().formats().css().run()`。
+- 提供自定义 Fontiny 插件系统。
+- 提供 `inspect`、`check`、`preview` 等校验和预览能力。
+- 支持从源码文件收集字符。
+- 支持 `fontiny.config.js` 配置文件。
+- 支持 `watch` 模式。
+- 支持 Nuxt server API 调用 SDK。
+- 已移除旧 WebSocket 任务入口。
 
-## Requirements
+## 环境要求
 
-- Node.js 18 or newer.
+- Node.js `>=18`
 
-## Install
+## 安装
 
 ```bash
 npm install fontiny
 ```
 
-For local development in this repository:
+本仓库本地开发：
 
 ```bash
 npm install
 npm run build
+npm test
 ```
 
-## CLI
+## CLI 使用
 
-### Subset Fonts
+### 字体子集化
 
 ```bash
 fontiny subset "input/**/*.{ttf,otf}" \
@@ -42,7 +52,19 @@ fontiny subset "input/**/*.{ttf,otf}" \
   --manifest
 ```
 
-### Convert Fonts
+常用参数：
+
+- `--text <text>`：直接传入需要保留的文本。
+- `--text-file <path>`：从文本文件读取需要保留的字符。
+- `--unicodes <list>`：传入 unicode 列表，例如 `U+4E00,U+4E01` 或 `U+4E00-9FFF`。
+- `--formats <list>`：输出格式，逗号分隔，例如 `woff2,woff`。
+- `--out <dir>`：输出目录。
+- `--css`：生成 `fontiny.css`。
+- `--manifest`：生成 `fontiny.manifest.json`。
+- `--watch`：监听输入变化并重新处理。
+- `--engine builtin|fonttools`：选择字体处理引擎。
+
+### 字体格式转换
 
 ```bash
 fontiny convert "input/**/*.{ttf,otf,woff,woff2}" \
@@ -50,7 +72,7 @@ fontiny convert "input/**/*.{ttf,otf,woff,woff2}" \
   --out output
 ```
 
-Subset and convert commands print a size report by default:
+`subset` 和 `convert` 默认会输出体积报告：
 
 ```text
 assets/fonts/ysbth.ttf
@@ -58,7 +80,102 @@ assets/fonts/ysbth.ttf
   woff2: 1.0 KB (99.9% reduced)
 ```
 
-### Generate Iconfont
+如需关闭：
+
+```bash
+fontiny subset input/font.ttf --text "你好" --no-report
+```
+
+### 查看字体信息
+
+```bash
+fontiny inspect output/assets/fonts/ysbth.woff2 --unicodes
+```
+
+输出包括：
+
+- 文件格式
+- 字体 family
+- subfamily
+- glyph 数量
+- unicode 数量
+- 文件体积
+- unicode 列表
+
+### 检查字体是否包含指定文本
+
+```bash
+fontiny check output/assets/fonts/ysbth.woff2 --text "你好Fontiny"
+```
+
+成功时：
+
+```text
+OK: all 8 characters included
+```
+
+缺字时：
+
+```text
+Missing: 春 雨
+```
+
+也可以从文件读取：
+
+```bash
+fontiny check output/font.woff2 --text-file chars.txt
+```
+
+### 从源码收集字符
+
+```bash
+fontiny collect "src/**/*.{vue,ts,tsx,html,md}" --out chars.txt
+fontiny subset input/font.ttf --text-file chars.txt --formats woff2 --out output
+```
+
+该命令会扫描源码文件，收集可见字符并去重，适合真实前端项目自动生成子集文本。
+
+### 启动预览页
+
+```bash
+fontiny preview output --text "你好Fontiny"
+```
+
+`preview` 会启动临时本地服务并展示输出目录中的字体，不会每次生成新的 HTML 文件。
+
+页面会展示：
+
+- 字体列表
+- 预览文本渲染
+- fallback 对比
+- 字体格式
+- 文件大小
+- glyph 和 unicode 数量
+
+### 初始化配置和目录
+
+```bash
+fontiny init
+```
+
+会创建：
+
+```text
+fontiny.config.js
+input/
+icons/
+output/
+```
+
+### 监听模式
+
+```bash
+fontiny subset "input/**/*.ttf" --text-file chars.txt --watch
+fontiny convert "input/**/*.ttf" --formats woff2 --watch
+fontiny iconfont icons --watch
+```
+
+### SVG 图标生成 iconfont
 
 ```bash
 fontiny iconfont icons \
@@ -69,7 +186,7 @@ fontiny iconfont icons \
   --types
 ```
 
-Use a fixed codepoint map to keep icon unicode values stable:
+固定 codepoint：
 
 ```bash
 fontiny iconfont icons \
@@ -78,67 +195,47 @@ fontiny iconfont icons \
   --out output/icons
 ```
 
-### Inspect Fonts
+`iconfont.json` 示例：
 
-```bash
-fontiny inspect output/assets/fonts/ysbth.woff2 --unicodes
+```json
+{
+  "home": "E001",
+  "user": "E002",
+  "setting": "E003"
+}
 ```
 
-### Check Text Coverage
+### 可选 fontTools 引擎
 
-```bash
-fontiny check output/assets/fonts/ysbth.woff2 --text "你好Fontiny"
-```
+默认引擎是内置 Node/WASM 方案，不需要 Python。
 
-### Collect Text From Source
-
-```bash
-fontiny collect "src/**/*.{vue,ts,tsx,html,md}" --out chars.txt
-fontiny subset input/font.ttf --text-file chars.txt --formats woff2 --out output
-```
-
-### Preview Output
-
-Preview starts a temporary local server instead of generating a new HTML file every time:
-
-```bash
-fontiny preview output --text "你好Fontiny"
-```
-
-### Initialize Config
-
-```bash
-fontiny init
-```
-
-### Watch Mode
-
-```bash
-fontiny subset "input/**/*.ttf" --text-file chars.txt --watch
-fontiny convert "input/**/*.ttf" --formats woff2 --watch
-fontiny iconfont icons --watch
-```
-
-### Optional fontTools Engine
-
-The default engine is built in and does not require Python. For higher-fidelity subsetting with fontTools, install it yourself and opt in:
+如果你需要使用 fontTools 的 `pyftsubset`，可以自行安装：
 
 ```bash
 pip install fonttools brotli
-fontiny subset input/font.ttf --engine fonttools --text-file chars.txt --formats ttf,woff2 --out output
 ```
 
-If `pyftsubset` is unavailable, Fontiny prints:
+然后显式启用：
+
+```bash
+fontiny subset input/font.ttf \
+  --engine fonttools \
+  --text-file chars.txt \
+  --formats ttf,woff2 \
+  --out output
+```
+
+如果本机没有 `pyftsubset`，会提示：
 
 ```text
 fontTools engine is not available.
-Install with: pip install fonttools brotli
-Or use default engine: --engine builtin
+Install with: pip install fonttools brotli.
+Or use default engine: --engine builtin.
 ```
 
-## SDK
+## SDK 使用
 
-### Convenience API
+### 便捷 API
 
 ```ts
 import Fontiny from 'fontiny'
@@ -152,7 +249,9 @@ await Fontiny()
   .run()
 ```
 
-### Plugin API
+### 插件 API
+
+`.use(plugin())` 使用的是 Fontiny 自己的插件系统，不是 Gulp 插件。
 
 ```ts
 import Fontiny from 'fontiny'
@@ -169,7 +268,17 @@ await Fontiny()
   .run()
 ```
 
-### Inspect and Check API
+插件接口形态：
+
+```ts
+type FontinyPlugin = {
+  name: string
+  transform?: (asset, ctx) => Promise<void> | void
+  afterAll?: (assets, ctx) => Promise<void> | void
+}
+```
+
+### inspect / check API
 
 ```ts
 import { hasText, inspectFont } from 'fontiny'
@@ -178,7 +287,7 @@ const font = await inspectFont('output/assets/fonts/ysbth.woff2')
 const result = hasText(font, '你好Fontiny')
 ```
 
-### Iconfont API
+### iconfont API
 
 ```ts
 import { iconfont } from 'fontiny/iconfont'
@@ -189,13 +298,14 @@ await iconfont()
   .formats(['ttf', 'woff', 'woff2', 'svg'])
   .css(true)
   .types(true)
+  .codepoints('iconfont.json')
   .dest('output/icons')
   .run()
 ```
 
-## Config
+## 配置文件
 
-CLI commands can load `fontiny.config.js`:
+CLI 会自动读取 `fontiny.config.js`。
 
 ```ts
 export default {
@@ -220,11 +330,42 @@ export default {
 }
 ```
 
-CLI flags override config values.
+优先级：
+
+```text
+CLI 参数 > 配置文件 > 默认值
+```
+
+## CSS 输出能力
+
+`css()` 插件已支持：
+
+- `font-family`
+- `font-weight`
+- `font-style`
+- `font-display`
+- `unicode-range`
+- base64 内联
+- 根据文件名或目录推断 family / weight / style
+- 多字体合并到一个 `fontiny.css`
+
+示例：
+
+```ts
+css({
+  familyFrom: 'parent-directory',
+  weightFrom: 'file',
+  styleFrom: 'file',
+  unicodeRange: true,
+  fontDisplay: 'swap'
+})
+```
 
 ## Nuxt Server API
 
-The repository includes Nuxt server routes that call the SDK directly:
+仓库中已经提供 Nuxt server routes，直接调用 SDK。
+
+### 子集化
 
 ```ts
 await $fetch('/api/fontiny/subset', {
@@ -240,26 +381,61 @@ await $fetch('/api/fontiny/subset', {
 })
 ```
 
-Additional routes:
+### 查看字体信息
 
 ```text
-GET  /api/fontiny/inspect?file=output/font.woff2
+GET /api/fontiny/inspect?file=output/font.woff2
+```
+
+### 检查文本覆盖
+
+```text
 POST /api/fontiny/check
 ```
 
-The previous WebSocket task runner on port `8080` has been removed.
+请求体：
 
-## Development
+```json
+{
+  "file": "output/font.woff2",
+  "text": "你好Fontiny"
+}
+```
+
+旧的 `8080` WebSocket 任务入口已经删除，避免任意 WebSocket 消息触发本机字体处理任务。
+
+## 开发命令
 
 ```bash
 npm test
 npm run build
+npm audit
 npm run pack:dry
 ```
 
-## Current Scope
+当前测试覆盖：
 
-Fontiny v0.2 intentionally does not include weight merging, variable fonts, TTC/OTC handling, or a browser runtime. Use it in Node.js, including Nuxt server routes or server plugins.
+- SDK 子集化和转换
+- 插件组合
+- inspect / check
+- collect
+- init
+- iconfont
+- 固定 codepoint
+- watch helper
+- fontTools 缺失提示
+- Windows 路径兼容
+
+## 当前边界
+
+当前版本暂不支持：
+
+- 字重合并
+- variable font 生成
+- TTC / OTC 字体集合处理
+- 浏览器端直接运行 SDK
+
+SDK 和 CLI 均面向 Node.js 环境。Nuxt 中请在 server route 或 server plugin 内调用。
 
 ## License
 
