@@ -1,0 +1,20 @@
+{
+  "name": "fontiny-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=packages/fontiny",
+    "test": "npm run test --workspace=packages/fontiny",
+    "dev": "npm run dev --workspace=apps/web",
+    "build:web": "npm run build --workspace=apps/web"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
+  }
+}
