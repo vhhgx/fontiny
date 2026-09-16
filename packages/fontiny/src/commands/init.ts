@@ -19,14 +19,28 @@ const defaultConfig = `export default {
 }
 `
 
+// 配置文件使用 ESM 语法；CommonJS 项目需要用 .mjs 后缀才能被 Node 加载。
+async function resolveConfigFileName() {
+  try {
+    const pkg = await fs.readJson('package.json')
+    return pkg.type === 'module' ? 'fontiny.config.js' : 'fontiny.config.mjs'
+  } catch {
+    return 'fontiny.config.mjs'
+  }
+}
+
 export async function runInitCommand() {
   await fs.ensureDir('input')
   await fs.ensureDir('icons')
   await fs.ensureDir('output')
 
-  if (!(await fs.pathExists('fontiny.config.js'))) {
-    await fs.writeFile('fontiny.config.js', defaultConfig, 'utf8')
+  const existing = ['fontiny.config.js', 'fontiny.config.mjs'].find((file) => fs.existsSync(file))
+  if (existing) {
+    console.log(`${existing} 已存在，未覆盖。input/、icons/ 和 output/ 目录已就绪。`)
+    return
   }
 
-  console.log('Created fontiny.config.js, input/, icons/, and output/.')
+  const configFile = await resolveConfigFileName()
+  await fs.writeFile(configFile, defaultConfig, 'utf8')
+  console.log(`已创建 ${configFile}、input/、icons/ 和 output/。`)
 }

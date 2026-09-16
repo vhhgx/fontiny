@@ -14,13 +14,13 @@ afterEach(async () => {
 describe('inspect and check helpers', () => {
   it('inspects subset output and verifies required text coverage', async () => {
     await Fontiny()
-      .src('assets/fonts/ysbth.ttf')
+      .src('fixtures/ysbth.ttf')
       .text('你好Fontiny')
       .formats(['woff2'])
       .dest(tmpDir)
       .run()
 
-    const font = await inspectFont(path.join(tmpDir, 'assets/fonts/ysbth.woff2'))
+    const font = await inspectFont(path.join(tmpDir, 'fixtures/ysbth.woff2'))
     expect(font.format).toBe('woff2')
     expect(font.glyphs).toBeGreaterThan(0)
     expect(font.unicodeCount).toBeGreaterThan(0)
@@ -31,7 +31,7 @@ describe('inspect and check helpers', () => {
 
   it('checks coverage from a text file', async () => {
     await Fontiny()
-      .src('assets/fonts/ysbth.ttf')
+      .src('fixtures/ysbth.ttf')
       .text('你好Fontiny')
       .formats(['woff2'])
       .dest(tmpDir)
@@ -41,7 +41,7 @@ describe('inspect and check helpers', () => {
     await fs.writeFile(textFile, '你好Fontiny', 'utf8')
 
     await expect(
-      runCheckCommand(path.join(tmpDir, 'assets/fonts/ysbth.woff2'), {
+      runCheckCommand(path.join(tmpDir, 'fixtures/ysbth.woff2'), {
         textFile,
       })
     ).resolves.toBeUndefined()

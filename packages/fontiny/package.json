@@ -28,6 +28,7 @@
   },
   "files": [
     "dist",
+    "templates",
     "README.md",
     "LICENSE"
   ],
@@ -68,8 +69,5 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
-  },
-  "overrides": {
-    "esbuild": "^0.28.1"
   }
 }

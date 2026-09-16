@@ -1,5 +1,6 @@
 import http from 'node:http'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { exec } from 'node:child_process'
 import fs from 'fs-extra'
 import fg from 'fast-glob'
@@ -11,6 +12,8 @@ type PreviewCommandOptions = {
   port?: string
   open?: boolean
 }
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url))
 
 const mimeTypes: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -33,7 +36,33 @@ function openUrl(url: string) {
   exec(command)
 }
 
+export async function getPreviewTemplatePath() {
+  const candidates = [
+    path.resolve(currentDir, '../templates/preview.html'),
+    path.resolve(currentDir, '../../templates/preview.html'),
+  ]
+
+  for (const candidate of candidates) {
+    if (await fs.pathExists(candidate)) {
+      return candidate
+    }
+  }
+
+  throw new Error('找不到预览模板文件：templates/preview.html')
+}
+
+async function loadPreviewTemplate() {
+  return fs.readFile(await getPreviewTemplatePath(), 'utf8')
+}
+
+function renderTemplate(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce((html, [key, value]) => {
+    return html.replaceAll(`{{${key}}}`, value)
+  }, template)
+}
+
 async function createHtml(outputDir: string, text: string) {
+  const template = await loadPreviewTemplate()
   const fontFiles = await fg('**/*.{ttf,otf,woff,woff2}', {
     cwd: outputDir,
     onlyFiles: true,
@@ -45,7 +74,7 @@ async function createHtml(outputDir: string, text: string) {
     try {
       infos.push({ relative: file, info: await inspectFont(absolute) })
     } catch {
-      // Skip unreadable preview candidates.
+      // 跳过无法读取的预览候选文件。
     }
   }
 
@@ -60,37 +89,18 @@ async function createHtml(outputDir: string, text: string) {
   const cards = infos
     .map(({ relative, info }, index) => `<section>
   <h2>${info.family ?? path.basename(relative)}</h2>
-  <p class="meta">${relative} · ${info.format} · ${formatBytes(info.size)} · ${info.glyphs} glyphs · ${info.unicodeCount} unicodes</p>
+  <p class="meta">${relative} · ${info.format} · ${formatBytes(info.size)} · ${info.glyphs} 个字形 · ${info.unicodeCount} 个 Unicode</p>
   <div class="sample" style="font-family: 'fontiny-preview-${index}', sans-serif">${escapeHtml(text)}</div>
   <div class="fallback">${escapeHtml(text)}</div>
 </section>`)
     .join('\n')
 
-  return `<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Fontiny Preview</title>
-  <style>
-${faces}
-body { margin: 0; font-family: system-ui, sans-serif; color: #1f2937; background: #f8fafc; }
-main { max-width: 1080px; margin: 0 auto; padding: 32px; }
-h1 { margin: 0 0 8px; font-size: 28px; }
-section { margin-top: 24px; padding: 20px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; }
-h2 { margin: 0 0 8px; font-size: 18px; }
-.meta { margin: 0 0 16px; color: #64748b; font-size: 13px; }
-.sample, .fallback { padding: 16px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 42px; line-height: 1.4; }
-.fallback { margin-top: 10px; font-family: system-ui, sans-serif; color: #64748b; }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>Fontiny Preview</h1>
-    <p>${infos.length} font file(s) found in ${escapeHtml(outputDir)}</p>
-    ${cards || '<p>No readable font files found.</p>'}
-  </main>
-</body>
-</html>`
+  return renderTemplate(template, {
+    FONT_FACES: faces,
+    OUTPUT_DIR: escapeHtml(outputDir),
+    FONT_COUNT: String(infos.length),
+    FONT_CARDS: cards || '<p>没有找到可读取的字体文件。</p>',
+  })
 }
 
 function escapeHtml(value: string) {
@@ -105,6 +115,7 @@ export async function runPreviewCommand(input: string, options: PreviewCommandOp
   const outputDir = path.resolve(process.cwd(), input)
   const port = Number(options.port ?? 4173)
   const text = options.text ?? '你好 Fontiny'
+  const templatePath = await getPreviewTemplatePath()
 
   const server = http.createServer(async (req, res) => {
     try {
@@ -117,16 +128,27 @@ export async function runPreviewCommand(input: string, options: PreviewCommandOp
       }
 
       const filePath = path.resolve(outputDir, `.${decodeURIComponent(url.pathname)}`)
-      if (!filePath.startsWith(outputDir) || !(await fs.pathExists(filePath))) {
+      const relativePath = path.relative(outputDir, filePath)
+      const stat = relativePath.startsWith('..') || path.isAbsolute(relativePath)
+        ? null
+        : await fs.stat(filePath).catch(() => null)
+      if (!stat?.isFile()) {
         res.writeHead(404)
-        res.end('Not found')
+        res.end('未找到文件')
         return
       }
 
       res.writeHead(200, {
         'content-type': mimeTypes[path.extname(filePath)] ?? 'application/octet-stream',
       })
-      fs.createReadStream(filePath).pipe(res)
+      const stream = fs.createReadStream(filePath)
+      stream.on('error', () => {
+        if (!res.headersSent) {
+          res.writeHead(500)
+        }
+        res.end('读取文件失败')
+      })
+      stream.pipe(res)
     } catch (error) {
       res.writeHead(500)
       res.end(error instanceof Error ? error.message : String(error))
@@ -135,7 +157,8 @@ export async function runPreviewCommand(input: string, options: PreviewCommandOp
 
   await new Promise<void>((resolve) => server.listen(port, resolve))
   const url = `http://localhost:${port}`
-  console.log(`Fontiny preview running at ${url}`)
+  console.log(`Fontiny 预览服务已启动：${url}`)
+  console.log(`预览 HTML 模板：${path.relative(process.cwd(), templatePath) || templatePath}`)
 
   if (options.open !== false) {
     openUrl(url)

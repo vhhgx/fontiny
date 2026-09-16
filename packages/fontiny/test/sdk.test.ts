@@ -5,7 +5,7 @@ import Fontiny, { css, manifest, subset, convert, rename } from '../src/index.js
 
 const root = process.cwd()
 const tmpDir = path.join(root, 'tmp', 'vitest-sdk')
-const fontPath = 'assets/fonts/ysbth.ttf'
+const fontPath = 'fixtures/ysbth.ttf'
 
 afterEach(async () => {
   await fs.remove(tmpDir)
@@ -23,8 +23,8 @@ describe('Fontiny SDK', () => {
 
     expect(result.errors).toEqual([])
     expect(result.files).toHaveLength(1)
-    expect(await fs.pathExists(path.join(tmpDir, 'assets/fonts/ysbth.ttf'))).toBe(true)
-    expect(await fs.pathExists(path.join(tmpDir, 'assets/fonts/ysbth.woff2'))).toBe(true)
+    expect(await fs.pathExists(path.join(tmpDir, 'fixtures/ysbth.ttf'))).toBe(true)
+    expect(await fs.pathExists(path.join(tmpDir, 'fixtures/ysbth.woff2'))).toBe(true)
 
     const cssText = await fs.readFile(path.join(tmpDir, 'fontiny.css'), 'utf8')
     expect(cssText).toContain('@font-face')
@@ -45,7 +45,7 @@ describe('Fontiny SDK', () => {
       .run()
 
     expect(result.errors).toEqual([])
-    expect(await fs.pathExists(path.join(tmpDir, 'assets/fonts/ysbth.woff2'))).toBe(true)
+    expect(await fs.pathExists(path.join(tmpDir, 'fixtures/ysbth.woff2'))).toBe(true)
     const manifestJson = await fs.readJson(path.join(tmpDir, 'fontiny.manifest.json'))
     expect(manifestJson.files[0].originalSize).toBeGreaterThan(0)
     expect(manifestJson.files[0].outputs[0].size).toBeGreaterThan(0)
@@ -60,7 +60,7 @@ describe('Fontiny SDK', () => {
       .run()
 
     const { inspectFont } = await import('../src/index.js')
-    const info = await inspectFont(path.join(tmpDir, 'assets/fonts/ysbth.ttf'))
+    const info = await inspectFont(path.join(tmpDir, 'fixtures/ysbth.ttf'))
     expect(info.family).toBe('BrandFont')
   })
 })

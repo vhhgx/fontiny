@@ -14,15 +14,15 @@ export async function runInspectCommand(input: string, options: InspectCommandOp
     return
   }
 
-  console.log(`file: ${path.relative(process.cwd(), result.file) || result.file}`)
-  console.log(`format: ${result.format}`)
-  console.log(`family: ${result.family ?? '-'}`)
-  console.log(`subfamily: ${result.subfamily ?? '-'}`)
-  console.log(`glyphs: ${result.glyphs}`)
-  console.log(`unicodes: ${result.unicodeCount}`)
-  console.log(`size: ${result.sizeLabel}`)
+  console.log(`文件：${path.relative(process.cwd(), result.file) || result.file}`)
+  console.log(`格式：${result.format}`)
+  console.log(`字体族：${result.family ?? '-'}`)
+  console.log(`子族：${result.subfamily ?? '-'}`)
+  console.log(`字形数：${result.glyphs}`)
+  console.log(`Unicode 数量：${result.unicodeCount}`)
+  console.log(`体积：${result.sizeLabel}`)
 
   if (options.unicodes) {
-    console.log(`unicode-list: ${result.unicodeLabels.join(', ')}`)
+    console.log(`Unicode 列表：${result.unicodeLabels.join(', ')}`)
   }
 }

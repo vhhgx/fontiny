@@ -24,12 +24,12 @@ export type FontInspectResult = {
 export async function inspectFont(filePath: string): Promise<FontInspectResult> {
   const absolutePath = path.resolve(filePath)
   if (!(await fs.pathExists(absolutePath))) {
-    throw new FontinyError(`Font file does not exist: ${filePath}`)
+    throw new FontinyError(`字体文件不存在：${filePath}`)
   }
 
   const stat = await fs.stat(absolutePath)
   if (!stat.isFile()) {
-    throw new FontinyError(`Path is not a file: ${filePath}`)
+    throw new FontinyError(`路径不是文件：${filePath}`)
   }
 
   const format = getFontFormat(absolutePath)

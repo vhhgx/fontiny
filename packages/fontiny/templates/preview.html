@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fontiny 字体预览</title>
+  <style>
+{{FONT_FACES}}
+body { margin: 0; font-family: system-ui, sans-serif; color: #1f2937; background: #f8fafc; }
+main { max-width: 1080px; margin: 0 auto; padding: 32px; }
+h1 { margin: 0 0 8px; font-size: 28px; }
+section { margin-top: 24px; padding: 20px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; }
+h2 { margin: 0 0 8px; font-size: 18px; }
+.meta { margin: 0 0 16px; color: #64748b; font-size: 13px; }
+.sample, .fallback { padding: 16px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 42px; line-height: 1.4; }
+.fallback { margin-top: 10px; font-family: system-ui, sans-serif; color: #64748b; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Fontiny 字体预览</h1>
+    <p>在 {{OUTPUT_DIR}} 中找到 {{FONT_COUNT}} 个字体文件。</p>
+    {{FONT_CARDS}}
+  </main>
+</body>
+</html>

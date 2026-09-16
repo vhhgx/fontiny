@@ -81,12 +81,12 @@ export class FontinyPipeline {
 
   async run(): Promise<FontinyRunResult> {
     if (this.patterns.length === 0) {
-      throw new FontinyError('No input source specified. Call .src() before .run().')
+      throw new FontinyError('未指定输入源。请先调用 .src()，再调用 .run()。')
     }
 
     const assets = await resolveAssets(this.patterns, this.cwd)
     if (assets.length === 0) {
-      throw new FontinyError(`No supported font files matched: ${this.patterns.join(', ')}`)
+      throw new FontinyError(`没有匹配到支持的字体文件：${this.patterns.join(', ')}`)
     }
 
     const outputDir = path.resolve(this.cwd, this.outputDir)

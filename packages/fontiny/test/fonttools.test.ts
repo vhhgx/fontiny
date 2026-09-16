@@ -13,12 +13,12 @@ describe('fonttools engine', () => {
 
     await expect(
       runFonttoolsSubset({
-        input: 'assets/fonts/ysbth.ttf',
+        input: 'fixtures/ysbth.ttf',
         output: 'tmp/fonttools',
         text: '你好',
         formats: ['woff2'],
       })
-    ).rejects.toThrow('fontTools engine is not available')
+    ).rejects.toThrow('fontTools 引擎不可用')
 
     vi.doUnmock('node:child_process')
   })

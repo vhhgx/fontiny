@@ -41,7 +41,7 @@ export async function runCollectCommand(input: string, options: CollectCommandOp
     const outPath = path.resolve(process.cwd(), options.out)
     await fs.ensureDir(path.dirname(outPath))
     await fs.writeFile(outPath, text, 'utf8')
-    console.log(`Collected ${text.length} characters from ${files.length} file(s) to ${options.out}.`)
+    console.log(`已从 ${files.length} 个文件收集 ${text.length} 个字符，并写入 ${options.out}。`)
     return
   }
 

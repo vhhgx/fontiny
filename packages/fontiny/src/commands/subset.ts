@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import Fontiny from '../index.js'
 import { css, manifest } from '../plugins/index.js'
 import type { FontinyConfig } from '../config/schema.js'
-import { parseFormats, parseUnicodes, printSizeReport } from './common.js'
+import { parseEngine, parseFormats, parseUnicodes, printSizeReport } from './common.js'
 import { runFonttoolsSubset } from '../engines/fonttools.js'
 
 type SubsetCommandOptions = {
@@ -17,11 +17,11 @@ type SubsetCommandOptions = {
   manifest?: boolean
   report?: boolean
   watch?: boolean
-  engine?: 'builtin' | 'fonttools'
+  engine?: string
 }
 
-export async function runSubsetCommand(input: string, options: SubsetCommandOptions, config: FontinyConfig) {
-  const engine = options.engine ?? config.engine ?? 'builtin'
+export async function runSubsetCommand(input: string | undefined, options: SubsetCommandOptions, config: FontinyConfig) {
+  const engine = parseEngine(options.engine) ?? config.engine ?? 'builtin'
   const formats = parseFormats(options.formats).length ? parseFormats(options.formats) : config.formats ?? ['woff2']
   const output = options.out ?? config.output ?? 'output'
 
@@ -43,12 +43,15 @@ export async function runSubsetCommand(input: string, options: SubsetCommandOpti
       await writeFonttoolsManifest(result, output)
     }
 
-    console.log(pc.green(`Processed ${result.files.length} font file(s).`))
+    console.log(pc.green(`已处理 ${result.files.length} 个字体文件。`))
     if (options.report !== false) {
       printSizeReport(result)
     }
     if (result.errors.length > 0) {
-      console.log(pc.yellow(`${result.errors.length} file(s) failed.`))
+      console.log(pc.yellow(`${result.errors.length} 个字体文件处理失败。`))
+    }
+    if (result.errors.length > 0 || result.files.length === 0) {
+      process.exitCode = 1
     }
     return
   }
@@ -72,12 +75,13 @@ export async function runSubsetCommand(input: string, options: SubsetCommandOpti
   }
 
   const result = await pipeline.run()
-  console.log(pc.green(`Processed ${result.files.length} font file(s).`))
+  console.log(pc.green(`已处理 ${result.files.length} 个字体文件。`))
   if (options.report !== false) {
     printSizeReport(result)
   }
   if (result.errors.length > 0) {
-    console.log(pc.yellow(`${result.errors.length} file(s) failed.`))
+    console.log(pc.yellow(`${result.errors.length} 个字体文件处理失败。`))
+    process.exitCode = 1
   }
 }
 

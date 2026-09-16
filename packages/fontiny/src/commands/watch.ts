@@ -1,4 +1,5 @@
 import chokidar from 'chokidar'
+import pc from 'picocolors'
 
 export async function runWithWatch(
   patterns: string[],
@@ -22,6 +23,9 @@ export async function runWithWatch(
     running = true
     try {
       await task()
+    } catch (error) {
+      // watch 模式需要常驻：任务失败只打印错误，继续监听。
+      console.error(pc.red(error instanceof Error ? error.message : String(error)))
     } finally {
       running = false
       if (pending) {
@@ -38,9 +42,12 @@ export async function runWithWatch(
     ignored: ['node_modules/**', 'dist/**', '.git/**'],
   })
 
-  watcher.on('all', async () => {
-    await run()
+  watcher.on('error', (error) => {
+    console.error(pc.red(error instanceof Error ? error.message : String(error)))
+  })
+  watcher.on('all', () => {
+    void run()
   })
 
-  console.log(`Watching ${patterns.join(', ')}`)
+  console.log(`正在监听：${patterns.join(', ')}`)
 }

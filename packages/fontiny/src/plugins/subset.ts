@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import type { FontinyAsset } from '../core/asset.js'
 import type { FontinyContext, FontinyPlugin } from '../core/context.js'
 import { createFont, ensureWoff2 } from '../core/fontEngine.js'
-import { textToCodePoints } from '../core/text.js'
+import { filterVisibleChars, textToCodePoints } from '../core/text.js'
 
 export type SubsetOptions = {
   text?: string
@@ -20,7 +20,7 @@ async function resolveSubset(options: SubsetOptions) {
   }
 
   if (options.textFile) {
-    const text = await fs.readFile(options.textFile, 'utf8')
+    const text = filterVisibleChars(await fs.readFile(options.textFile, 'utf8'))
     textToCodePoints(text).forEach((codePoint) => codePoints.add(codePoint))
   }
 

@@ -18,7 +18,9 @@ describe('init command', () => {
 
     await runInitCommand()
 
-    expect(await fs.pathExists(path.join(tmpDir, 'fontiny.config.js'))).toBe(true)
+    const hasConfig = await fs.pathExists(path.join(tmpDir, 'fontiny.config.js')) ||
+      await fs.pathExists(path.join(tmpDir, 'fontiny.config.mjs'))
+    expect(hasConfig).toBe(true)
     expect(await fs.pathExists(path.join(tmpDir, 'input'))).toBe(true)
     expect(await fs.pathExists(path.join(tmpDir, 'icons'))).toBe(true)
     expect(await fs.pathExists(path.join(tmpDir, 'output'))).toBe(true)

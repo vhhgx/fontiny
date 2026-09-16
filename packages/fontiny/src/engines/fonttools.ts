@@ -26,12 +26,26 @@ export type FonttoolsSubsetResult = {
   errors: Array<{ input?: string; message: string }>
 }
 
-async function assertFonttoolsAvailable() {
+export async function checkFonttoolsAvailability() {
   try {
-    await execFileAsync('pyftsubset', ['--version'])
+    const result = await execFileAsync('pyftsubset', ['--version'])
+    return {
+      available: true,
+      version: `${result.stdout}${result.stderr}`.trim(),
+    }
   } catch {
+    return {
+      available: false,
+      version: undefined,
+    }
+  }
+}
+
+async function assertFonttoolsAvailable() {
+  const result = await checkFonttoolsAvailability()
+  if (!result.available) {
     throw new FontinyError(
-      'fontTools engine is not available. Install with: pip install fonttools brotli. Or use default engine: --engine builtin.'
+      'fontTools 引擎不可用。安装命令：pip install fonttools brotli。也可以继续使用默认内置引擎：--engine builtin。'
     )
   }
 }
@@ -79,7 +93,7 @@ function flavorArgs(format: FontinyFormat) {
   }
 
   if (format === 'svg') {
-    throw new FontinyError('fontTools engine does not support SVG font output. Use --engine builtin for SVG.')
+    throw new FontinyError('fontTools 引擎不支持输出 SVG font。如需 SVG 输出，请使用内置引擎：--engine builtin。')
   }
 
   return []
@@ -92,6 +106,9 @@ export async function runFonttoolsSubset(
 
   const cwd = path.resolve(options.cwd ?? process.cwd())
   const assets = await resolveAssets([options.input], cwd)
+  if (assets.length === 0) {
+    throw new FontinyError(`没有匹配到支持的字体文件：${options.input}`)
+  }
   const outputDir = path.resolve(cwd, options.output)
   const textOptions = await resolveTextOptions(options)
   const result: FonttoolsSubsetResult = {
@@ -102,46 +119,54 @@ export async function runFonttoolsSubset(
 
   try {
     for (const asset of assets) {
-      const outputDetails: FontinyFileResult['outputDetails'] = []
-      const outputs: string[] = []
+      // 单个文件失败不中断整个批次，记录到 errors 后继续处理其余文件。
+      try {
+        const outputDetails: FontinyFileResult['outputDetails'] = []
+        const outputs: string[] = []
 
-      for (const format of options.formats) {
-        const filename = `${asset.basename}.${format}`
-        const outputPath = outputPathFor(outputDir, asset, filename)
-        await fs.ensureDir(path.dirname(outputPath))
+        for (const format of options.formats) {
+          const filename = `${asset.basename}.${format}`
+          const outputPath = outputPathFor(outputDir, asset, filename)
+          await fs.ensureDir(path.dirname(outputPath))
 
-        const args = [
-          asset.inputPath,
-          '--output-file',
-          outputPath,
-          ...textOptions.args,
-          ...flavorArgs(format),
-          '--layout-features=*',
-          '--name-IDs=*',
-          '--glyph-names',
-          '--symbol-cmap',
-        ]
+          const args = [
+            asset.inputPath,
+            '--output-file',
+            outputPath,
+            ...textOptions.args,
+            ...flavorArgs(format),
+            '--layout-features=*',
+            '--name-IDs=*',
+            '--glyph-names',
+            '--symbol-cmap',
+          ]
 
-        await execFileAsync('pyftsubset', args, {
-          cwd,
-          maxBuffer: 1024 * 1024 * 10,
+          await execFileAsync('pyftsubset', args, {
+            cwd,
+            maxBuffer: 1024 * 1024 * 10,
+          })
+
+          const stat = await fs.stat(outputPath)
+          outputs.push(outputPath)
+          outputDetails.push({
+            path: outputPath,
+            size: stat.size,
+            format,
+          })
+        }
+
+        result.files.push({
+          input: asset.inputPath,
+          originalSize: asset.originalBuffer.length,
+          outputs,
+          outputDetails,
         })
-
-        const stat = await fs.stat(outputPath)
-        outputs.push(outputPath)
-        outputDetails.push({
-          path: outputPath,
-          size: stat.size,
-          format,
+      } catch (error) {
+        result.errors.push({
+          input: asset.inputPath,
+          message: error instanceof Error ? error.message : String(error),
         })
       }
-
-      result.files.push({
-        input: asset.inputPath,
-        originalSize: asset.originalBuffer.length,
-        outputs,
-        outputDetails,
-      })
     }
   } finally {
     await textOptions.cleanup()
