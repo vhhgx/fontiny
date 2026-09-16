@@ -1,4 +1,4 @@
-import { inspectFont } from '../../../src/index'
+import { inspectFont } from 'fontiny'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)

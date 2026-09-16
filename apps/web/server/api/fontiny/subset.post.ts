@@ -1,4 +1,4 @@
-import Fontiny, { css, manifest } from '../../../src/index'
+import Fontiny, { css, manifest } from 'fontiny'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)

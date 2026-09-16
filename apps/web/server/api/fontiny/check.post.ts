@@ -1,4 +1,4 @@
-import { hasText, inspectFont } from '../../../src/index'
+import { hasText, inspectFont } from 'fontiny'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
