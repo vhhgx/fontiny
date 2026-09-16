@@ -2,24 +2,6 @@
 
 Fontiny 是一个面向 Node.js 的字体处理 SDK 和 CLI 工具，用于字体子集化、字体格式转换、SVG 图标转 iconfont，以及字体产物校验。
 
-## 仓库结构（monorepo）
-
-```
-packages/fontiny   # fontiny 本体：Node.js SDK + CLI（发布到 npm 的包）
-apps/web           # Nuxt 演示站点，通过 server API 调用 fontiny SDK
-docs/              # 开发与规划文档
-```
-
-本仓库使用 npm workspaces，统一在根目录执行：
-
-```bash
-npm install        # 安装全部 workspace 依赖
-npm run build      # 构建 packages/fontiny
-npm test           # 运行 packages/fontiny 测试
-npm run dev        # 启动 apps/web（Nuxt 开发服务器）
-npm run build:web  # 构建 apps/web
-```
-
 ## 已完成功能
 
 - 支持 `ttf`、`otf`、`woff`、`woff2` 输入。
